@@ -1,8 +1,0 @@
-#ifndef GRAPH_LIB_GRAPHSMETHODSTEST_H
-#define GRAPH_LIB_GRAPHSMETHODSTEST_H
-
-
-void graphMethodsTest();
-
-
-#endif //GRAPH_LIB_GRAPHSMETHODSTEST_H

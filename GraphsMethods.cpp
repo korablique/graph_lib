@@ -2,7 +2,7 @@
 #include "GraphsMethods.h"
 
 /// for undirected graphs
-std::vector<size_t> getDegreeList(std::vector<std::vector<bool>>& adjacency_matrix) {
+std::vector<size_t> getDegreeList(const std::vector<std::vector<bool>>& adjacency_matrix) {
     // vertex degree = sum of 1 in the matrix row
     std::vector<size_t> degree_list(adjacency_matrix.size());
     for (int i = 0; i < adjacency_matrix.size(); i++) {
@@ -13,7 +13,7 @@ std::vector<size_t> getDegreeList(std::vector<std::vector<bool>>& adjacency_matr
 }
 
 /// for undirected weighted graphs
-std::vector<size_t> getDegreeList(std::vector<std::vector<double>>& adjacency_matrix) {
+std::vector<size_t> getDegreeList(const std::vector<std::vector<double>>& adjacency_matrix) {
     std::vector<size_t> degree_list(adjacency_matrix.size());
     for (int i = 0; i < adjacency_matrix.size(); i++) {
         // infinity means there is no such edge in the graph
@@ -26,7 +26,7 @@ std::vector<size_t> getDegreeList(std::vector<std::vector<double>>& adjacency_ma
 }
 
 // TODO пока int вместо Node
-std::vector<std::vector<int>> getAdjacencyList(std::vector<std::vector<bool>>& adjacency_matrix) {
+std::vector<std::vector<int>> getAdjacencyList(const std::vector<std::vector<bool>>& adjacency_matrix) {
     std::vector<std::vector<int>> adj_list(adjacency_matrix.size());
     for (int i = 0; i < adjacency_matrix.size(); i++) {
         for (int j = 0; j < adjacency_matrix.size(); j++) {
@@ -38,10 +38,10 @@ std::vector<std::vector<int>> getAdjacencyList(std::vector<std::vector<bool>>& a
     return adj_list;
 }
 
-size_t dfsImpl(int node, std::vector<bool>& visited, std::vector<std::vector<int>>& adjacency_list) {
+size_t dfsImpl(const int node, std::vector<bool>& visited, const std::vector<std::vector<int>>& adjacency_list) {
     size_t visited_vertices = 1;
     visited[node] = true; // TODO сделать map
-    for (auto v : adjacency_list[node]) { // TODO сделать ссылку
+    for (auto& v : adjacency_list[node]) {
         if (!visited[v]) {
             visited_vertices += dfsImpl(v, visited, adjacency_list);
         }
@@ -49,19 +49,19 @@ size_t dfsImpl(int node, std::vector<bool>& visited, std::vector<std::vector<int
     return visited_vertices;
 }
 
-size_t dfs(int node, std::vector<std::vector<int>>& adjacency_list) {
+size_t dfs(const int node, const std::vector<std::vector<int>>& adjacency_list) {
     std::vector<bool> visited(adjacency_list.size(), false);
     return dfsImpl(node, visited, adjacency_list);
 }
 
 void dfsForConnectedComponentsImpl(
-        int node,
+        const int node,
         std::vector<bool>& visited,
-        std::vector<std::vector<int>>& adjacency_list,
+        const std::vector<std::vector<int>>& adjacency_list,
         std::vector<int>& connected_component) { // TODO сделать Node
     visited[node] = true; // TODO сделать map
     connected_component.push_back(node);
-    for (auto& v : adjacency_list[node]) { // TODO сделать ссылку
+    for (auto& v : adjacency_list[node]) {
         if (!visited[v]) {
             dfsForConnectedComponentsImpl(v, visited, adjacency_list, connected_component);
         }
@@ -69,7 +69,9 @@ void dfsForConnectedComponentsImpl(
 }
 
 std::vector<std::vector<int>> getConnectedComponentsImpl(
-        std::vector<int>& nodes_list, std::vector<std::vector<int>>& adjacency_list, std::vector<bool>& visited) {
+        const std::vector<int>& nodes_list,
+        const std::vector<std::vector<int>>& adjacency_list,
+        std::vector<bool>& visited) {
     std::vector<std::vector<int>> components; // TODO заменить на Node
     auto remaining_nodes = nodes_list;
     std::vector<int> current_component;
@@ -89,13 +91,13 @@ std::vector<std::vector<int>> getConnectedComponentsImpl(
 }
 
 std::vector<std::vector<int>> getConnectedComponents(
-        std::vector<int>& nodes, std::vector<std::vector<bool>>& adjacency_matrix) {
+        const std::vector<int>& nodes, const std::vector<std::vector<bool>>& adjacency_matrix) {
     auto adjacency_list = getAdjacencyList(adjacency_matrix);
     std::vector<bool> visited(adjacency_list.size(), false);
     return getConnectedComponentsImpl(nodes, adjacency_list, visited);
 }
 
-bool isConnected(std::vector<std::vector<bool>>& adjacency_matrix) {
+bool isConnected(const std::vector<std::vector<bool>>& adjacency_matrix) {
     auto adjacency_list = getAdjacencyList(adjacency_matrix);
     size_t vertices_reached = dfs(0, adjacency_list);
     return vertices_reached == adjacency_matrix.size();

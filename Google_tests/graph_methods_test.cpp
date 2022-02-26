@@ -65,12 +65,11 @@ TEST_F(GraphMethodsTest, GetDegreeListWorksForWeightedSimpleGraphs) {
 }
 
 TEST_F(GraphMethodsTest, GetAdjacencyListWorksForSimpleGraphs) {
-    // TODO for the first time there is int instead of Node
-    std::vector<std::vector<int>> expected;
-    expected.push_back(std::vector<int>({1, 2}));
-    expected.push_back(std::vector<int>({0}));
-    expected.push_back(std::vector<int>({0}));
-    expected.push_back(std::vector<int>());
+    std::vector<std::vector<size_t>> expected;
+    expected.push_back(std::vector<size_t>({1, 2}));
+    expected.push_back(std::vector<size_t>({0}));
+    expected.push_back(std::vector<size_t>({0}));
+    expected.push_back(std::vector<size_t>());
 
     auto adj_list = getAdjacencyList(adj_matrix_disconnected_simple);
 
@@ -81,9 +80,8 @@ TEST_F(GraphMethodsTest, GetAdjacencyListWorksForSimpleGraphs) {
 }
 
 TEST_F(GraphMethodsTest, GetAdjacencyListWorksForDirectedGraphs) {
-    // TODO for the first time there is int instead of Node
-    std::vector<std::vector<int>> expected(adj_matrix_disconnected_directed.size());
-    expected[0] = std::vector<int>({1, 2});
+    std::vector<std::vector<size_t>> expected(adj_matrix_disconnected_directed.size());
+    expected[0] = std::vector<size_t>({1, 2});
 
     auto adj_list = getAdjacencyList(adj_matrix_disconnected_directed);
 
@@ -94,17 +92,20 @@ TEST_F(GraphMethodsTest, GetAdjacencyListWorksForDirectedGraphs) {
 }
 
 TEST_F(GraphMethodsTest, IsConnectedWorksForDisconnectedGraph) {
-    bool is_connected = isConnected(adj_matrix_disconnected_simple);
+    std::vector<int16_t> nodes({0, 1, 2, 3});
+    bool is_connected = isConnected(nodes, adj_matrix_disconnected_simple);
     EXPECT_FALSE(is_connected);
 }
 
 TEST_F(GraphMethodsTest, IsConnectedWorksForConnectedSimpleGraph) {
-    bool is_connected = isConnected(adj_matrix_connected_simple);
+    std::vector<int16_t> nodes({0, 1, 2, 3});
+    bool is_connected = isConnected(nodes, adj_matrix_connected_simple);
     EXPECT_TRUE(is_connected);
 }
 
 TEST(IsConnectedTest, WorksForDirectedGraph) {
     size_t matrix_size = 4;
+    std::vector<int16_t> nodes({0, 1, 2, 3});
     std::vector<std::vector<bool>> adjacency_matrix(matrix_size);
     for (int i = 0; i < matrix_size; i++) {
         adjacency_matrix[i] = std::vector<bool>(matrix_size, false);
@@ -113,18 +114,18 @@ TEST(IsConnectedTest, WorksForDirectedGraph) {
     adjacency_matrix[0][2] = true;
     adjacency_matrix[2][3] = true;
 
-    bool is_connected = isConnected(adjacency_matrix);
+    bool is_connected = isConnected(nodes, adjacency_matrix);
     EXPECT_TRUE(is_connected);
 
     adjacency_matrix[2][3] = false;
-    is_connected = isConnected(adjacency_matrix);
+    is_connected = isConnected(nodes, adjacency_matrix);
     EXPECT_FALSE(is_connected);
 }
 
 TEST_F(GraphMethodsTest, GetConnectedComponents) {
-    std::vector<int> nodes = {0, 1, 2, 3};
+    std::vector<int16_t> nodes = {0, 1, 2, 3};
     auto components = getConnectedComponents(nodes, adj_matrix_disconnected_simple);
-    std::vector<std::vector<int>> expected;
+    std::vector<std::vector<int16_t>> expected;
     expected.push_back({0, 1, 2});
     expected.push_back({3});
     EXPECT_EQ(components, expected);
@@ -155,7 +156,7 @@ TEST_F(GraphMethodsTest, GetConnectedComponents) {
 }
 
 TEST(GetConnectedComponents, WorksForIsolatedNodes) {
-    std::vector<int> nodes = {0, 1, 2};
+    std::vector<int16_t> nodes = {0, 1, 2};
 
     // graph without edges
     size_t matrix_size = nodes.size();
@@ -164,14 +165,16 @@ TEST(GetConnectedComponents, WorksForIsolatedNodes) {
         adj_matrix.push_back(std::vector<bool>(matrix_size, false));
     }
 
-    std::vector<std::vector<int>> expected({{0}, {1}, {2}});
+    std::vector<std::vector<int16_t>> expected({{0}, {1}, {2}});
     auto components = getConnectedComponents(nodes, adj_matrix);
     EXPECT_EQ(components, expected);
 }
 
 TEST_F(GraphMethodsTest, GetConnectedComponentsWorksForDirectedGraph) {
-    std::vector<int> nodes = {0, 1, 2, 3};
+    std::vector<int16_t> nodes = {0, 1, 2, 3};
     auto components = getConnectedComponents(nodes, adj_matrix_disconnected_directed);
-    std::vector<std::vector<int>> expected({{0, 1, 2}, {3}});
+    std::vector<std::vector<int16_t>> expected({{0, 1, 2}, {3}});
     EXPECT_EQ(components, expected);
 }
+
+// TODO replace all int16_t by Node

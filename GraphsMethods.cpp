@@ -1,4 +1,5 @@
 #include <limits>
+#include <unordered_map>
 #include "GraphsMethods.h"
 
 /// for undirected graphs
@@ -25,9 +26,12 @@ std::vector<size_t> getDegreeList(const std::vector<std::vector<double>>& adjace
     return degree_list;
 }
 
-// TODO пока int вместо Node
-std::vector<std::vector<int>> getAdjacencyList(const std::vector<std::vector<bool>>& adjacency_matrix) {
-    std::vector<std::vector<int>> adj_list(adjacency_matrix.size());
+/**
+ * @param adjacency_matrix
+ * @return list of nodes' indices
+ */
+std::vector<std::vector<size_t>> getAdjacencyList(const std::vector<std::vector<bool>>& adjacency_matrix) {
+    std::vector<std::vector<size_t>> adj_list(adjacency_matrix.size());
     for (int i = 0; i < adjacency_matrix.size(); i++) {
         for (int j = 0; j < adjacency_matrix.size(); j++) {
             if (adjacency_matrix[i][j]) {
@@ -38,9 +42,13 @@ std::vector<std::vector<int>> getAdjacencyList(const std::vector<std::vector<boo
     return adj_list;
 }
 
-size_t dfsImpl(const int node, std::vector<bool>& visited, const std::vector<std::vector<int>>& adjacency_list) {
+// TODO replace all int16_t by Node
+size_t dfsImpl(
+        const int16_t node,
+        std::unordered_map<int16_t, bool>& visited,
+        const std::vector<std::vector<size_t>>& adjacency_list) {
     size_t visited_vertices = 1;
-    visited[node] = true; // TODO сделать map
+    visited[node] = true;
     for (auto& v : adjacency_list[node]) {
         if (!visited[v]) {
             visited_vertices += dfsImpl(v, visited, adjacency_list);
@@ -49,17 +57,20 @@ size_t dfsImpl(const int node, std::vector<bool>& visited, const std::vector<std
     return visited_vertices;
 }
 
-size_t dfs(const int node, const std::vector<std::vector<int>>& adjacency_list) {
-    std::vector<bool> visited(adjacency_list.size(), false);
-    return dfsImpl(node, visited, adjacency_list);
+size_t dfs(const std::vector<int16_t>& nodes_list, const std::vector<std::vector<size_t>>& adjacency_list) {
+    std::unordered_map<int16_t, bool> visited;
+    for (auto& node : nodes_list) {
+        visited.insert({node, false});
+    }
+    return dfsImpl(nodes_list[0], visited, adjacency_list);
 }
 
 void dfsForConnectedComponentsImpl(
-        const int node,
-        std::vector<bool>& visited,
-        const std::vector<std::vector<int>>& adjacency_list,
-        std::vector<int>& connected_component) { // TODO сделать Node
-    visited[node] = true; // TODO сделать map
+        const int16_t node,
+        std::unordered_map<int16_t, bool>& visited,
+        const std::vector<std::vector<size_t>>& adjacency_list,
+        std::vector<int16_t>& connected_component) {
+    visited[node] = true;
     connected_component.push_back(node);
     for (auto& v : adjacency_list[node]) {
         if (!visited[v]) {
@@ -68,13 +79,13 @@ void dfsForConnectedComponentsImpl(
     }
 }
 
-std::vector<std::vector<int>> getConnectedComponentsImpl(
-        const std::vector<int>& nodes_list,
-        const std::vector<std::vector<int>>& adjacency_list,
-        std::vector<bool>& visited) {
-    std::vector<std::vector<int>> components; // TODO заменить на Node
+std::vector<std::vector<int16_t>> getConnectedComponentsImpl(
+        const std::vector<int16_t>& nodes_list,
+        const std::vector<std::vector<size_t>>& adjacency_list,
+        std::unordered_map<int16_t, bool>& visited) {
+    std::vector<std::vector<int16_t>> components;
     auto remaining_nodes = nodes_list;
-    std::vector<int> current_component;
+    std::vector<int16_t> current_component;
     while (!remaining_nodes.empty()) {
         dfsForConnectedComponentsImpl(remaining_nodes[0], visited, adjacency_list, current_component);
         components.push_back(current_component);
@@ -90,15 +101,18 @@ std::vector<std::vector<int>> getConnectedComponentsImpl(
     return components;
 }
 
-std::vector<std::vector<int>> getConnectedComponents(
-        const std::vector<int>& nodes, const std::vector<std::vector<bool>>& adjacency_matrix) {
+std::vector<std::vector<int16_t>> getConnectedComponents(
+        const std::vector<int16_t>& nodes, const std::vector<std::vector<bool>>& adjacency_matrix) {
     auto adjacency_list = getAdjacencyList(adjacency_matrix);
-    std::vector<bool> visited(adjacency_list.size(), false);
+    std::unordered_map<int16_t, bool> visited;
+    for (auto& node : nodes) {
+        visited.insert({node, false});
+    }
     return getConnectedComponentsImpl(nodes, adjacency_list, visited);
 }
 
-bool isConnected(const std::vector<std::vector<bool>>& adjacency_matrix) {
+bool isConnected(std::vector<int16_t>& nodes, const std::vector<std::vector<bool>>& adjacency_matrix) {
     auto adjacency_list = getAdjacencyList(adjacency_matrix);
-    size_t vertices_reached = dfs(0, adjacency_list);
+    size_t vertices_reached = dfs(nodes, adjacency_list);
     return vertices_reached == adjacency_matrix.size();
 }

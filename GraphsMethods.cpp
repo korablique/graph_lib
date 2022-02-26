@@ -38,7 +38,7 @@ std::vector<std::vector<int>> getAdjacencyList(std::vector<std::vector<bool>>& a
     return adj_list;
 }
 
-size_t dfsImpl(int node, std::vector<bool>& visited, std::vector<std::vector<int>> adjacency_list) {
+size_t dfsImpl(int node, std::vector<bool>& visited, std::vector<std::vector<int>>& adjacency_list) {
     size_t visited_vertices = 1;
     visited[node] = true; // TODO сделать map
     for (auto v : adjacency_list[node]) { // TODO сделать ссылку
@@ -49,9 +49,50 @@ size_t dfsImpl(int node, std::vector<bool>& visited, std::vector<std::vector<int
     return visited_vertices;
 }
 
-size_t dfs(int node, std::vector<std::vector<int>> adjacency_list) {
+size_t dfs(int node, std::vector<std::vector<int>>& adjacency_list) {
     std::vector<bool> visited(adjacency_list.size(), false);
     return dfsImpl(node, visited, adjacency_list);
+}
+
+void dfsForConnectedComponentsImpl(
+        int node,
+        std::vector<bool>& visited,
+        std::vector<std::vector<int>>& adjacency_list,
+        std::vector<int>& connected_component) { // TODO сделать Node
+    visited[node] = true; // TODO сделать map
+    connected_component.push_back(node);
+    for (auto& v : adjacency_list[node]) { // TODO сделать ссылку
+        if (!visited[v]) {
+            dfsForConnectedComponentsImpl(v, visited, adjacency_list, connected_component);
+        }
+    }
+}
+
+std::vector<std::vector<int>> getConnectedComponentsImpl(
+        std::vector<int>& nodes_list, std::vector<std::vector<int>>& adjacency_list, std::vector<bool>& visited) {
+    std::vector<std::vector<int>> components; // TODO заменить на Node
+    auto remaining_nodes = nodes_list;
+    std::vector<int> current_component;
+    while (!remaining_nodes.empty()) {
+        dfsForConnectedComponentsImpl(remaining_nodes[0], visited, adjacency_list, current_component);
+        components.push_back(current_component);
+        for (auto item : current_component) {
+            // remove() moves the elements to be removed to the end of vector
+            // and returns the iterator to the first element to be removed.
+            // erase() removes all elements from this iterator to remaining_nodes.end()
+            remaining_nodes.erase(std::remove(
+                    remaining_nodes.begin(), remaining_nodes.end(), item), remaining_nodes.end());
+        }
+        current_component.clear();
+    }
+    return components;
+}
+
+std::vector<std::vector<int>> getConnectedComponents(
+        std::vector<int>& nodes, std::vector<std::vector<bool>>& adjacency_matrix) {
+    auto adjacency_list = getAdjacencyList(adjacency_matrix);
+    std::vector<bool> visited(adjacency_list.size(), false);
+    return getConnectedComponentsImpl(nodes, adjacency_list, visited);
 }
 
 bool isConnected(std::vector<std::vector<bool>>& adjacency_matrix) {
@@ -59,4 +100,3 @@ bool isConnected(std::vector<std::vector<bool>>& adjacency_matrix) {
     size_t vertices_reached = dfs(0, adjacency_list);
     return vertices_reached == adjacency_matrix.size();
 }
-

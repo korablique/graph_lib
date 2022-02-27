@@ -16,11 +16,13 @@ private:
     std::vector<std::pair<Node<T2>, Node<T2>>> m_edges;
     std::vector<std::vector<bool>> m_adjacency_matrix;
 
-    void makeAdjacencyMatrix(std::vector<Node<T2>> &nodes, std::vector<std::pair<Node<T2>, Node<T2>>> &edges);
+    void setAdjacencyMatrix(std::vector<Node<T2>> &nodes, std::vector<std::pair<Node<T2>, Node<T2>>> &edges);
 
 public:
     Graph(std::vector<Node<T2>> &nodes_list, std::vector<std::pair<Node<T2>, Node<T2>>> &edges_list);
     explicit Graph(std::vector<Node<T2>> &nodes, std::vector<std::vector<bool>> &adjacency_matrix);
+
+    Graph<T2>* buildCn(const std::vector<Node<T2>> &nodes, size_t n);
 
     std::vector<std::vector<bool>> getAdjacencyMatrix(){ return m_adjacency_matrix; }
 };

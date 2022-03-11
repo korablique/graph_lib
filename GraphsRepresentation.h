@@ -35,7 +35,10 @@ public:
 
     Graph<T2>* buildCn(const std::vector<Node<T2>> &nodes, size_t n);
 
-    std::vector<std::vector<bool>> getAdjacencyMatrix(){ return m_adjacency_matrix; }
+    void addNode(Node<T2>& node);
+
+    std::vector<std::vector<bool>> getAdjacencyMatrix();
+    std::vector<Node<T2>> getNodesList();
     std::vector<size_t> getDegreeList();
     std::vector<std::vector<size_t>> getAdjacencyList();
     bool isConnected();

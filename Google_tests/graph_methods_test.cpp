@@ -78,10 +78,7 @@ TEST_F(GraphMethodsTest, GetAdjacencyListWorksForSimpleGraphs) {
     Graph<int> graph(nodes, adj_matrix_disconnected_simple);
     auto adj_list = graph.getAdjacencyList();
 
-    EXPECT_EQ(adj_list.size(), expected.size());
-    for (int i = 0; i < expected.size(); i++) {
-        EXPECT_EQ(adj_list[i], expected[i]);
-    }
+    EXPECT_EQ(adj_list, expected);
 }
 
 // directed graph has not been implemented yet
@@ -205,7 +202,25 @@ TEST_F(GraphMethodsTest, GetComplementGraphTest) {
     expected.push_back({0, 1, 0, 1});
     expected.push_back({1, 1, 1, 0});
 
-    for (int i = 0; i < expected.size(); i++) {
-        EXPECT_EQ(complement_graph.getAdjacencyMatrix()[i], expected[i]);
-    }
+    EXPECT_EQ(complement_graph.getAdjacencyMatrix(), expected);
+}
+
+TEST_F(GraphMethodsTest, AddNode) {
+    std::vector<Node<std::string>> nodes(
+            {Node<std::string>("0"), Node<std::string>("1"), Node<std::string>("2"), Node<std::string>("3")});
+    Graph<std::string> graph(nodes, adj_matrix_disconnected_simple);
+    Node<std::string> new_node("new");
+    graph.addNode(new_node);
+
+    std::vector<Node<std::string>> nodes_expected = nodes;
+    nodes_expected.push_back(new_node);
+    EXPECT_EQ(graph.getNodesList(), nodes_expected);
+
+    std::vector<std::vector<bool>> adj_matrix_expected;
+    adj_matrix_expected.push_back({0, 1, 1, 0, 0});
+    adj_matrix_expected.push_back({1, 0, 0, 0, 0});
+    adj_matrix_expected.push_back({1, 0, 0, 0, 0});
+    adj_matrix_expected.push_back({0, 0, 0, 0, 0});
+    adj_matrix_expected.push_back({0, 0, 0, 0, 0});
+    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
 }

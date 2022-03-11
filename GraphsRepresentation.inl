@@ -189,3 +189,23 @@ Graph<T> Graph<T>::getComplementGraph() {
     Graph<T> complement_graph(m_nodes, complement_adj_matrix);
     return complement_graph;
 }
+
+template<typename T>
+std::vector<std::vector<bool>> Graph<T>::getAdjacencyMatrix() {
+    return m_adjacency_matrix;
+}
+
+template<typename T>
+std::vector<Node<T>> Graph<T>::getNodesList() {
+    return m_nodes;
+}
+
+template<typename T>
+void Graph<T>::addNode(Node<T>& node) {
+    m_nodes.push_back(node);
+    // change adjacency matrix
+    m_adjacency_matrix.push_back(std::vector<bool>(m_nodes.size() - 1, false)); // add new line for new node
+    for (auto& line : m_adjacency_matrix) {
+        line.resize(line.size() + 1, false); // add new column, initialize new column with false
+    }
+}

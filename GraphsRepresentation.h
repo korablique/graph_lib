@@ -25,6 +25,11 @@ public:
     Graph<T2>* buildCn(const std::vector<Node<T2>> &nodes, size_t n);
 
     std::vector<std::vector<bool>> getAdjacencyMatrix(){ return m_adjacency_matrix; }
+
+
+    void AddNode(Node<T2> node);
+    void RemoveNode(Node<T2> node);
+    void AddEdge(Node<T2> nodeFirst, Node<T2> nodeSecond);
 };
 
 #endif //GRAPH_LIB_GRAPHSREPRESENTATION_H

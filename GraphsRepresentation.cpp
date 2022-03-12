@@ -1,5 +1,7 @@
 #include <vector>
 #include <utility>
+#include <cstring>
+#include <algorithm>
 #include "GraphsRepresentation.h"
 
 template <typename T>
@@ -52,4 +54,31 @@ Graph<T>::Graph(std::vector<Node<T>> &nodes, std::vector<std::vector<bool>> &adj
         }
     }
     m_nodes = nodes;
+}
+
+template <typename T>
+void Graph<T>::AddNode(Node<T> node)
+{
+    m_nodes.pop_back(node);
+    for (auto & i : m_adjacency_matrix)
+    {
+        i.push_back(false);
+    }
+    std::vector<bool> adjacency_matrix_add;
+    adjacency_matrix_add.reserve(m_adjacency_matrix.size() + 1);
+    for (auto && i : adjacency_matrix_add)
+    {
+        i = false;
+    }
+    m_adjacency_matrix.push_back(adjacency_matrix_add);
+}
+
+template <typename T>
+void Graph<T>::RemoveNode(Node<T> node)
+{
+}
+
+template <typename T>
+void Graph<T>::AddEdge(Node<T> nodeFirst, Node<T> nodeSecond)
+{
 }

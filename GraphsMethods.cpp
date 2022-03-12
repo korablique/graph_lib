@@ -1,5 +1,6 @@
 #include <limits>
 #include <unordered_map>
+#include <cstdint>
 #include "GraphsMethods.h"
 
 /// for undirected graphs

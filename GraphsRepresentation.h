@@ -27,23 +27,23 @@ private:
 
     std::vector<std::vector<Node<T2>>> getConnectedComponentsImpl(
             const std::vector<std::vector<size_t>>& adjacency_list,
-            std::map<size_t, bool>& visited);
+            std::map<size_t, bool>& visited) const;
 
 public:
-    Graph(std::vector<Node<T2>> &nodes_list, std::vector<std::pair<Node<T2>, Node<T2>>> &edges_list);
-    explicit Graph(std::vector<Node<T2>> &nodes, std::vector<std::vector<bool>> &adjacency_matrix);
+    Graph(const std::vector<Node<T2>> &nodes_list, const std::vector<std::pair<Node<T2>, Node<T2>>> &edges_list);
+    explicit Graph(const std::vector<Node<T2>> &nodes, const std::vector<std::vector<bool>> &adjacency_matrix);
 
     Graph<T2>* buildCn(const std::vector<Node<T2>> &nodes, size_t n);
 
     void addNode(Node<T2>& node);
 
-    std::vector<std::vector<bool>> getAdjacencyMatrix();
-    std::vector<Node<T2>> getNodesList();
-    std::vector<size_t> getDegreeList();
-    std::vector<std::vector<size_t>> getAdjacencyList();
-    bool isConnected();
-    std::vector<std::vector<Node<T2>>> getConnectedComponents();
-    Graph<T2> getComplementGraph();
+    std::vector<std::vector<bool>> getAdjacencyMatrix() const;
+    std::vector<Node<T2>> getNodesList() const;
+    std::vector<size_t> getDegreeList() const;
+    std::vector<std::vector<size_t>> getAdjacencyList() const;
+    bool isConnected() const;
+    std::vector<std::vector<Node<T2>>> getConnectedComponents() const;
+    Graph<T2> getComplementGraph() const;
 };
 
 #include "GraphsRepresentation.inl"

@@ -27,14 +27,14 @@ void Graph<T>::setAdjacencyMatrix(std::vector<Node<T>> &nodes, std::vector<std::
 }
 
 template <typename T>
-Graph<T>::Graph(std::vector<Node<T>> &nodes_list, std::vector<std::pair<Node<T>, Node<T>>> &edges_list){
+Graph<T>::Graph(const std::vector<Node<T>> &nodes_list, const std::vector<std::pair<Node<T>, Node<T>>> &edges_list){
     m_nodes = nodes_list;
     m_edges = edges_list;
     makeAdjacencyMatrix(nodes_list, edges_list);
 }
 
 template <typename T>
-Graph<T>::Graph(std::vector<Node<T>> &nodes, std::vector<std::vector<bool>> &adjacency_matrix){
+Graph<T>::Graph(const std::vector<Node<T>> &nodes, const std::vector<std::vector<bool>> &adjacency_matrix){
     for (const auto& i: adjacency_matrix){
         m_adjacency_matrix.push_back(i);
     }
@@ -93,7 +93,7 @@ void dfsForConnectedComponentsImpl(
 template<typename T>
 std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponentsImpl(
         const std::vector<std::vector<size_t>>& adjacency_list,
-        std::map<size_t, bool>& visited) {
+        std::map<size_t, bool>& visited) const {
     std::vector<std::vector<Node<T>>> components;
 
     std::vector<size_t> remaining_nodes_indices(m_nodes.size());
@@ -124,7 +124,7 @@ std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponentsImpl(
 }
 
 template<typename T>
-std::vector<size_t> Graph<T>::getDegreeList() {
+std::vector<size_t> Graph<T>::getDegreeList() const {
     // vertex degree = sum of ones in the matrix row
     auto adjacency_matrix = getAdjacencyMatrix();
     std::vector<size_t> degree_list(adjacency_matrix.size());
@@ -140,7 +140,7 @@ std::vector<size_t> Graph<T>::getDegreeList() {
  * @return list of nodes' indices
  */
 template<typename T>
-std::vector<std::vector<size_t>> Graph<T>::getAdjacencyList() {
+std::vector<std::vector<size_t>> Graph<T>::getAdjacencyList() const {
     auto adjacency_matrix = getAdjacencyMatrix();
     std::vector<std::vector<size_t>> adj_list(adjacency_matrix.size());
     for (int i = 0; i < adjacency_matrix.size(); i++) {
@@ -154,14 +154,14 @@ std::vector<std::vector<size_t>> Graph<T>::getAdjacencyList() {
 }
 
 template<typename T>
-bool Graph<T>::isConnected() {
+bool Graph<T>::isConnected() const {
     auto adjacency_list = getAdjacencyList();
     size_t vertices_reached = dfs(adjacency_list);
     return vertices_reached == m_adjacency_matrix.size();
 }
 
 template<typename T>
-std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponents() {
+std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponents() const {
     auto adjacency_list = getAdjacencyList();
     std::map<size_t, bool> visited;
     for (auto index = 0; index < m_nodes.size(); index++) {
@@ -171,7 +171,7 @@ std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponents() {
 }
 
 template<typename T>
-Graph<T> Graph<T>::getComplementGraph() {
+Graph<T> Graph<T>::getComplementGraph() const {
     std::vector<std::vector<bool>> complement_adj_matrix(m_adjacency_matrix.size());
     for (auto& line : complement_adj_matrix) {
         line = std::vector<bool>(m_adjacency_matrix.size());
@@ -191,12 +191,12 @@ Graph<T> Graph<T>::getComplementGraph() {
 }
 
 template<typename T>
-std::vector<std::vector<bool>> Graph<T>::getAdjacencyMatrix() {
+std::vector<std::vector<bool>> Graph<T>::getAdjacencyMatrix() const {
     return m_adjacency_matrix;
 }
 
 template<typename T>
-std::vector<Node<T>> Graph<T>::getNodesList() {
+std::vector<Node<T>> Graph<T>::getNodesList() const {
     return m_nodes;
 }
 

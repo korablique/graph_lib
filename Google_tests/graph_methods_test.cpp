@@ -227,3 +227,27 @@ TEST_F(GraphMethodsTest, AddNode) {
     adj_matrix_expected.push_back({0, 0, 0, 0, 0});
     EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
 }
+
+TEST_F(GraphMethodsTest, RemoveNodeWorks) {
+    // if the node with the given id exists
+    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
+    Graph<std::string> graph(nodes_data, adj_matrix_disconnected_simple);
+    size_t node_id_to_remove = graph.getNodesList()[2].getId();
+    graph.removeNode(node_id_to_remove);
+
+    std::vector<Node<std::string>> nodes_expected(
+            {Node<std::string>(0, "str"), Node<std::string>(1, "str"), Node<std::string>(3, "str")});
+    EXPECT_EQ(graph.getNodesList(), nodes_expected);
+
+    std::vector<std::pair<size_t, size_t>> edges_expected({{0, 1}});
+    EXPECT_EQ(graph.getEdgesList(), edges_expected);
+
+    std::vector<std::vector<bool>> adj_matrix_expected({{0, 1, 0}, {1, 0, 0}, {0, 0, 0}});
+    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
+
+    // if the node with the given id does not exist
+    graph.removeNode(123);
+    EXPECT_EQ(graph.getNodesList(), nodes_expected);
+    EXPECT_EQ(graph.getEdgesList(), edges_expected);
+    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
+}

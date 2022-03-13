@@ -13,10 +13,16 @@ private:
 public:
     Node(int64_t id, T1 data);
     bool operator==(const Node<T1>& other) const;
+
+    int64_t getId() const;
+    T1 getData() const;
+
+    template <class T2>
+    friend class Graph;
 };
 
 template <class T2>
-class Graph{
+class Graph {
 private:
     int64_t m_last_id = -1;
     std::vector<Node<T2>> m_nodes;
@@ -39,9 +45,11 @@ public:
     Graph<T2>* buildCn(const std::vector<Node<T2>> &nodes, size_t n);
 
     int64_t addNode(T2& node_data);
+    void removeNode(int64_t id);
 
     std::vector<std::vector<bool>> getAdjacencyMatrix() const;
     std::vector<Node<T2>> getNodesList() const;
+    std::vector<std::pair<size_t, size_t>> getEdgesList() const;
     std::vector<size_t> getDegreeList() const;
     std::vector<std::vector<size_t>> getAdjacencyList() const;
     bool isConnected() const;

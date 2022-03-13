@@ -8,34 +8,37 @@
 template <class T1>
 class Node {
 private:
+    int64_t m_id;
     T1 m_data;
 public:
-    explicit Node(T1 data): m_data(data){};
-    bool operator==(const Node<T1>& other) const {
-        return m_data == other.m_data;
-    }
+    Node(int64_t id, T1 data);
+    bool operator==(const Node<T1>& other) const;
 };
 
 template <class T2>
 class Graph{
 private:
+    int64_t m_last_id = -1;
     std::vector<Node<T2>> m_nodes;
-    std::vector<std::pair<Node<T2>, Node<T2>>> m_edges;
+    std::vector<std::pair<size_t, size_t>> m_edges;
     std::vector<std::vector<bool>> m_adjacency_matrix;
 
-    void setAdjacencyMatrix(std::vector<Node<T2>> &nodes, std::vector<std::pair<Node<T2>, Node<T2>>> &edges);
+    Graph(const std::vector<Node<T2>> nodes, const std::vector<std::vector<bool>> m_adjacency_matrix);
 
+    void setNodesList(const std::vector<T2> &nodes_data);
+    void setEdgesList(const std::vector<std::vector<bool>> &adjacency_matrix);
+    void setAdjacencyMatrix(std::vector<Node<T2>> &nodes, std::vector<std::pair<size_t, size_t>> &edges);
     std::vector<std::vector<Node<T2>>> getConnectedComponentsImpl(
             const std::vector<std::vector<size_t>>& adjacency_list,
             std::map<size_t, bool>& visited) const;
 
 public:
-    Graph(const std::vector<Node<T2>> &nodes_list, const std::vector<std::pair<Node<T2>, Node<T2>>> &edges_list);
-    explicit Graph(const std::vector<Node<T2>> &nodes, const std::vector<std::vector<bool>> &adjacency_matrix);
+    Graph(const std::vector<T2>& nodes_data, const std::vector<std::pair<size_t, size_t>>& edges_list);
+    Graph(const std::vector<T2> &nodes_data, const std::vector<std::vector<bool>> &adjacency_matrix);
 
     Graph<T2>* buildCn(const std::vector<Node<T2>> &nodes, size_t n);
 
-    void addNode(Node<T2>& node);
+    int64_t addNode(T2& node_data);
 
     std::vector<std::vector<bool>> getAdjacencyMatrix() const;
     std::vector<Node<T2>> getNodesList() const;

@@ -2,6 +2,24 @@
 #include <utility>
 #include "GraphsRepresentation.h"
 
+template<class T1>
+Node<T1>::Node(int64_t id, T1 data): m_id(id), m_data(data) {}
+
+template<class T1>
+bool Node<T1>::operator==(const Node<T1> &other) const {
+    return m_id == other.m_id;
+}
+
+/**
+ * Private constructor for example to create a complement graph (with the same nodes, but different edges).
+ * Needed to avoid recreating vertices.
+ */
+template<typename T>
+Graph<T>::Graph(const std::vector<Node<T>> nodes, const std::vector<std::vector<bool>> adjacency_matrix):
+        m_nodes(nodes), m_adjacency_matrix(adjacency_matrix) {
+    setEdgesList(adjacency_matrix);
+}
+
 template <typename T>
 Graph<T>* Graph<T>::buildCn(const std::vector<Node<T>> &nodes, size_t n){
     std::vector<std::pair<Node<T>, Node<T>>> edges_list;
@@ -14,7 +32,7 @@ Graph<T>* Graph<T>::buildCn(const std::vector<Node<T>> &nodes, size_t n){
 }
 
 template <typename T>
-void Graph<T>::setAdjacencyMatrix(std::vector<Node<T>> &nodes, std::vector<std::pair<Node<T>, Node<T>>> &edges){
+void Graph<T>::setAdjacencyMatrix(std::vector<Node<T>> &nodes, std::vector<std::pair<size_t, size_t>> &edges){
     m_adjacency_matrix.resize(nodes.size());
     for (auto i: m_adjacency_matrix){
         i.resize(nodes.size());
@@ -22,36 +40,45 @@ void Graph<T>::setAdjacencyMatrix(std::vector<Node<T>> &nodes, std::vector<std::
     for (auto i: edges){
         m_adjacency_matrix[i.first][i.second] = true;
         m_adjacency_matrix[i.second][i.first] = true;
-
     }
 }
 
 template <typename T>
-Graph<T>::Graph(const std::vector<Node<T>> &nodes_list, const std::vector<std::pair<Node<T>, Node<T>>> &edges_list){
-    m_nodes = nodes_list;
-    m_edges = edges_list;
-    makeAdjacencyMatrix(nodes_list, edges_list);
-}
-
-template <typename T>
-Graph<T>::Graph(const std::vector<Node<T>> &nodes, const std::vector<std::vector<bool>> &adjacency_matrix){
-    for (const auto& i: adjacency_matrix){
-        m_adjacency_matrix.push_back(i);
-    }
-    for (int i = 0; i < adjacency_matrix.size(); ++i){ // making vector of edges
-        for (int j = 0; j < adjacency_matrix.size(); ++j){
-            if (j == i + 1){
-                i++;
-                j = -1;
-                continue;
-            }
+void Graph<T>::setEdgesList(const std::vector<std::vector<bool>> &adjacency_matrix) {
+    for (int i = 0; i < adjacency_matrix.size(); ++i) {
+        for (int j = i + 1; j < adjacency_matrix.size(); ++j) {
             if (adjacency_matrix[i][j]) {
-                std::pair<Node<T>, Node<T>> added_pair{nodes[i], nodes[j]};
+                std::pair<size_t, size_t> added_pair{i, j};
                 m_edges.push_back(added_pair);
             }
         }
     }
-    m_nodes = nodes;
+}
+
+template<typename T>
+void Graph<T>::setNodesList(const std::vector<T> &nodes_data) {
+    std::vector<Node<T>> nodes_list;
+    for (auto& data : nodes_data) {
+        Node<T> node(++m_last_id, data);
+        nodes_list.push_back(node);
+    }
+    m_nodes = nodes_list;
+}
+
+template<typename T>
+Graph<T>::Graph(const std::vector<T> &nodes_data, const std::vector<std::pair<size_t, size_t>> &edges_list) {
+    // create nodes with given data
+    setNodesList(nodes_data);
+    // copy edges list
+    m_edges = edges_list;
+    setAdjacencyMatrix(m_nodes, m_edges);
+}
+
+template <typename T>
+Graph<T>::Graph(const std::vector<T> &nodes_data, const std::vector<std::vector<bool>> &adjacency_matrix) {
+    m_adjacency_matrix = adjacency_matrix;
+    setEdgesList(adjacency_matrix);
+    setNodesList(nodes_data);
 }
 
 size_t dfsImpl(
@@ -123,6 +150,9 @@ std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponentsImpl(
     return components;
 }
 
+/**
+ * @return degree list in descending order
+ */
 template<typename T>
 std::vector<size_t> Graph<T>::getDegreeList() const {
     // vertex degree = sum of ones in the matrix row
@@ -200,12 +230,17 @@ std::vector<Node<T>> Graph<T>::getNodesList() const {
     return m_nodes;
 }
 
+/**
+ * @return id of the added node
+ */
 template<typename T>
-void Graph<T>::addNode(Node<T>& node) {
-    m_nodes.push_back(node);
+int64_t Graph<T>::addNode(T& node_data) {
+    Node<T> new_node(++m_last_id, node_data);
+    m_nodes.push_back(new_node);
     // change adjacency matrix
     m_adjacency_matrix.push_back(std::vector<bool>(m_nodes.size() - 1, false)); // add new line for new node
     for (auto& line : m_adjacency_matrix) {
         line.resize(line.size() + 1, false); // add new column, initialize new column with false
     }
+    return m_last_id;
 }

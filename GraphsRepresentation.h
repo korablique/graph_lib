@@ -38,9 +38,11 @@ private:
             const std::vector<std::vector<size_t>>& adjacency_list,
             std::map<size_t, bool>& visited) const;
 
-public:
     Graph(const std::vector<T2>& nodes_data, const std::vector<std::pair<size_t, size_t>>& edges_list);
     Graph(const std::vector<T2> &nodes_data, const std::vector<std::vector<bool>> &adjacency_matrix);
+public:
+    static Graph<T2> buildGraph(const std::vector<T2>& nodes_data, const std::vector<std::pair<size_t, size_t>>& edges_list);
+    static Graph<T2> buildGraph(const std::vector<T2>& nodes_data, const std::vector<std::vector<bool>>& adjacency_matrix);
 
     Graph<T2>* buildCn(const std::vector<Node<T2>> &nodes, size_t n);
 

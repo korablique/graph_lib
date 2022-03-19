@@ -12,5 +12,5 @@ add_executable(Google_Tests_run
         ../GraphAlgorithms.cpp
         graph_methods_test.cpp
         graph_build_test.cpp
-)
+        graphs_comparing_test.cpp)
 target_link_libraries(Google_Tests_run gtest gtest_main)

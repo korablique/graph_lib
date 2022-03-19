@@ -46,6 +46,8 @@ public:
 
     Graph<T2>* buildCn(const std::vector<Node<T2>> &nodes, size_t n);
 
+    bool operator==(const Graph<T2>& other) const;
+
     int64_t addNode(const T2& node_data);
     void removeNode(int64_t id);
 

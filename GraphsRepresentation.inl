@@ -1,5 +1,6 @@
 #include <vector>
 #include <utility>
+#include <unordered_set>
 #include "GraphAlgorithms.h"
 
 template<class T1>
@@ -305,4 +306,47 @@ Graph<T> Graph<T>::buildGraph(const std::vector<T> &nodes_data, const std::vecto
     }
 
     return Graph<T>(nodes_data, adjacency_matrix);
+}
+
+template<class T>
+bool Graph<T>::operator==(const Graph<T> &other) const {
+    // compare data in the nodes
+    std::unordered_set<T> nodes_data;
+    for (const auto& node : m_nodes) {
+        nodes_data.insert(node.m_data);
+    }
+    std::unordered_set<T> other_nodes_data;
+    for (const auto& node : other.getNodesList()) {
+        other_nodes_data.insert(node.m_data);
+    }
+    if (nodes_data != other_nodes_data) {
+        return false;
+    }
+
+
+    // compare edges list
+    auto other_nodes = other.getNodesList();
+    auto other_edges = other.getEdgesList();
+    if (m_edges.size() != other_edges.size()) {
+        return false;
+    }
+
+    for (auto& edge : m_edges) {
+        bool edge_found = false;
+        for (auto& other_edge : other_edges) {
+            // check whether the data at the vertices that form an edge in this graph
+            // match the data at the vertices that form an edge of another graph
+            if ((m_nodes[edge.first].m_data == other_nodes[other_edge.first].m_data
+                        || m_nodes[edge.first].m_data == other_nodes[other_edge.second].m_data)
+                    && (m_nodes[edge.second].m_data == other_nodes[other_edge.first].m_data
+                        || m_nodes[edge.second].m_data == other_nodes[other_edge.second].m_data)) {
+                edge_found = true;
+                break;
+            }
+        }
+        if (!edge_found) {
+            return false;
+        }
+    }
+    return true;
 }

@@ -160,6 +160,9 @@ std::vector<std::vector<size_t>> Graph<T>::getAdjacencyList() const {
 
 template<typename T>
 bool Graph<T>::isConnected() const {
+    if (m_nodes.empty()) {
+        return false; // graph with no vertices is considered disconnected
+    }
     auto adjacency_list = getAdjacencyList();
     size_t vertices_reached = dfs(adjacency_list);
     return vertices_reached == m_adjacency_matrix.size();
@@ -214,7 +217,7 @@ std::vector<std::pair<size_t, size_t>> Graph<T>::getEdgesList() const {
  * @return id of the added node
  */
 template<typename T>
-int64_t Graph<T>::addNode(T& node_data) {
+int64_t Graph<T>::addNode(const T& node_data) {
     Node<T> new_node(++m_last_id, node_data);
     m_nodes.push_back(new_node);
     // change adjacency matrix

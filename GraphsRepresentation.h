@@ -46,7 +46,7 @@ public:
 
     Graph<T2>* buildCn(const std::vector<Node<T2>> &nodes, size_t n);
 
-    int64_t addNode(T2& node_data);
+    int64_t addNode(const T2& node_data);
     void removeNode(int64_t id);
 
     std::vector<std::vector<bool>> getAdjacencyMatrix() const;

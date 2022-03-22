@@ -4,6 +4,13 @@
 #include <map>
 #include <algorithm>
 #include <numeric>
+#include <queue>
+
+struct BFSreturn{
+    std::vector<int> ret_vector;
+    int ret_int;
+    bool is_path;
+};
 
 template <class T1>
 class Node {
@@ -55,6 +62,7 @@ public:
     bool isConnected() const;
     std::vector<std::vector<Node<T2>>> getConnectedComponents() const;
     Graph<T2> getComplementGraph() const;
+    std::vector<int> BFS(size_t start, size_t end);
 };
 
 #include "GraphsRepresentation.inl"

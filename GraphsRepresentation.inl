@@ -292,4 +292,41 @@ void Graph<T>::removeNode(int64_t id) {
     setAdjacencyMatrix(m_nodes, m_edges);
 }
 
+template <class T>
+std::vector<int> Graph<T>::BFS(size_t start, size_t end){
+    std::queue<int> vertix; //очередь ближайших вершин
+    vertix.push (start);
+    std::vector<bool> painted (m_adjacency_matrix.size()); //вектор покрашенных вершин
+    for (int i = 0; i < m_adjacency_matrix.size(); i++){
+        painted[i] = false;
+    }
+    painted[start] = true;
+    std::vector<int> distance (m_adjacency_matrix.size()); // расстояние до данной вершины
+    std::vector<std::vector<int>> path (m_adjacency_matrix.size()); // путь до данной вершин
+    while (!vertix.empty()) {
+        int current_vertix = vertix.front();
+        vertix.pop();
+        for (int i=0; i < m_adjacency_matrix.size(); i++) {
+            if ((!painted[i]) && (m_adjacency_matrix[current_vertix][i] == true)) { //проверка смежной вершины на непокрашенность
+                painted[i] = true;
+                vertix.push(i); // добавление в очередь
+                distance[i] = distance[current_vertix]++; // подсчет расстояния до этой вершины
+                for (int j = 0; j < path[current_vertix].size(); j++) {
+                    path[i].push_back(path[current_vertix][j]); // построение пути
+                }
+                path[i].push_back(current_vertix);
+                if (i == end) {
+                }
+            }
+        }
+    }
+
+    if (!painted[end]) {
+        return path[end];;
+    }
+    else {
+        reverse(path.begin(), path.end());
+        return path[end];
+    }
+}
 

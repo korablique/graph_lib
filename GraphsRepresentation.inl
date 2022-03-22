@@ -209,3 +209,10 @@ void Graph<T>::addNode(const T& node) {
         line.resize(line.size() + 1, false); // add new column, initialize new column with false
     }
 }
+
+template<typename T>
+void Graph<T>::addEdge(const T& nodeFirst, const T& nodeSecond)
+{
+
+}
+

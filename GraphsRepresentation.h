@@ -26,6 +26,8 @@ public:
 
     void addNode(const T& node);
 
+    void addEdge(const T& nodeFirst, const T& nodeSecond);
+
     std::vector<std::vector<bool>> getAdjacencyMatrix() const;
     std::vector<T> getNodesList() const;
     std::vector<size_t> getDegreeList() const;

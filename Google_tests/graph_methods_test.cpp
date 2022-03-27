@@ -53,8 +53,8 @@ protected:
 
 
 TEST_F(GraphMethodsTest, GetDegreeListWorksForSimpleGraphs) {
-    std::vector<int> nodes({0, 1, 2, 3});
-    Graph<int> graph(nodes, adj_matrix_disconnected_simple);
+    std::vector<int> nodes_data({0, 1, 2, 3});
+    Graph<int> graph(nodes_data, adj_matrix_disconnected_simple);
     auto degree_list = graph.getDegreeList();
     std::vector<size_t> expected({2, 1, 1, 0});
     EXPECT_EQ(degree_list, expected);
@@ -74,8 +74,8 @@ TEST_F(GraphMethodsTest, GetAdjacencyListWorksForSimpleGraphs) {
     expected.push_back(std::vector<size_t>({0}));
     expected.push_back(std::vector<size_t>());
 
-    std::vector<int> nodes({0, 1, 2, 3});
-    Graph<int> graph(nodes, adj_matrix_disconnected_simple);
+    std::vector<int> nodes_data({0, 1, 2, 3});
+    Graph<int> graph(nodes_data, adj_matrix_disconnected_simple);
     auto adj_list = graph.getAdjacencyList();
 
     EXPECT_EQ(adj_list, expected);
@@ -95,15 +95,15 @@ TEST_F(GraphMethodsTest, GetAdjacencyListWorksForSimpleGraphs) {
 //}
 
 TEST_F(GraphMethodsTest, IsConnectedWorksForDisconnectedGraph) {
-    std::vector<int> nodes({0, 1, 2, 3});
-    Graph<int> graph(nodes, adj_matrix_disconnected_simple);
+    std::vector<int> nodes_data({0, 1, 2, 3});
+    Graph<int> graph(nodes_data, adj_matrix_disconnected_simple);
     bool is_connected = graph.isConnected();
     EXPECT_FALSE(is_connected);
 }
 
 TEST_F(GraphMethodsTest, IsConnectedWorksForConnectedSimpleGraph) {
-    std::vector<int> nodes({0, 1, 2, 3});
-    Graph<int> graph(nodes, adj_matrix_connected_simple);
+    std::vector<int> nodes_data({0, 1, 2, 3});
+    Graph<int> graph(nodes_data, adj_matrix_connected_simple);
     bool is_connected = graph.isConnected();
     EXPECT_TRUE(is_connected);
 }
@@ -129,19 +129,19 @@ TEST_F(GraphMethodsTest, IsConnectedWorksForConnectedSimpleGraph) {
 //}
 
 TEST_F(GraphMethodsTest, GetConnectedComponents) {
-    std::vector<int> nodes({0, 1, 2, 3});
-    Graph<int> graph(nodes, adj_matrix_disconnected_simple);
+    std::vector<int> nodes_data({0, 1, 2, 3});
+    Graph<int> graph(nodes_data, adj_matrix_disconnected_simple);
     auto components = graph.getConnectedComponents();
-    std::vector<std::vector<int>> expected;
-    expected.push_back({0, 1, 2});
-    expected.push_back({3});
+    std::vector<std::vector<Node<int>>> expected;
+    expected.push_back({Node<int>(0, 0), Node<int>(1, 1), Node<int>(2, 2)});
+    expected.push_back({Node<int>(3, 3)});
     EXPECT_EQ(components, expected);
 
     // graph with more connected components
-    nodes.push_back(4);
-    nodes.push_back(5);
+    nodes_data.push_back(4);
+    nodes_data.push_back(5);
 
-    size_t matrix_size = nodes.size();
+    size_t matrix_size = nodes_data.size();
     std::vector<std::vector<bool>> adj_matrix;
     for (int i = 0; i < matrix_size; i++) {
         adj_matrix.push_back(std::vector<bool>(matrix_size, false));
@@ -154,28 +154,28 @@ TEST_F(GraphMethodsTest, GetConnectedComponents) {
     adj_matrix[5][3] = true;
     adj_matrix[4][5] = true;
     adj_matrix[5][4] = true;
-    
-    Graph<int> graph2(nodes, adj_matrix);
+
+    Graph<int> graph2(nodes_data, adj_matrix);
     auto components2 = graph2.getConnectedComponents();
     expected.clear();
-    expected.push_back({0});
-    expected.push_back({1, 2});
-    expected.push_back({3, 4, 5});
+    expected.push_back({Node<int>(0, 0)});
+    expected.push_back({Node<int>(1, 1), Node<int>(2, 2)});
+    expected.push_back({Node<int>(3, 3), Node<int>(4, 4), Node<int>(5, 5)});
     EXPECT_EQ(components2, expected);
 }
 
 TEST(GetConnectedComponents, WorksForIsolatedNodes) {
-    std::vector<int> nodes = {0, 1, 2};
+    std::vector<int> nodes_data = {0, 1, 2};
 
     // graph without edges
-    size_t matrix_size = nodes.size();
+    size_t matrix_size = nodes_data.size();
     std::vector<std::vector<bool>> adj_matrix;
     for (int i = 0; i < matrix_size; i++) {
         adj_matrix.push_back(std::vector<bool>(matrix_size, false));
     }
-    Graph<int> graph(nodes, adj_matrix);
+    Graph<int> graph(nodes_data, adj_matrix);
 
-    std::vector<std::vector<int>> expected({{0}, {1}, {2}});
+    std::vector<std::vector<Node<int>>> expected({{Node<int>(0, 0)}, {Node<int>(1, 1)}, {Node<int>(2, 2)}});
     auto components = graph.getConnectedComponents();
     EXPECT_EQ(components, expected);
 }
@@ -193,8 +193,8 @@ TEST(GetConnectedComponents, WorksForIsolatedNodes) {
 // 1 0 0 0
 // 0 0 0 0
 TEST_F(GraphMethodsTest, GetComplementGraphTest) {
-    std::vector<int> nodes({0, 1, 2, 3});
-    Graph<int> graph(nodes, adj_matrix_disconnected_simple);
+    std::vector<int> nodes_data({0, 1, 2, 3});
+    Graph<int> graph(nodes_data, adj_matrix_disconnected_simple);
     auto complement_graph = graph.getComplementGraph();
     std::vector<std::vector<bool>> expected;
     expected.push_back({0, 0, 0, 1});
@@ -206,14 +206,17 @@ TEST_F(GraphMethodsTest, GetComplementGraphTest) {
 }
 
 TEST_F(GraphMethodsTest, AddNode) {
-    std::vector<std::string> nodes(
-            {"0", "1", "2", "3"});
-    Graph<std::string> graph(nodes, adj_matrix_disconnected_simple);
-    std::string new_node("new");
-    graph.addNode(new_node);
+    std::vector<std::string> nodes_data({"0", "1", "2", "3"});
+    Graph<std::string> graph(nodes_data, adj_matrix_disconnected_simple);
+    std::string new_node_data("new");
+    graph.addNode(new_node_data);
 
-    std::vector<std::string> nodes_expected = nodes;
-    nodes_expected.push_back(new_node);
+    std::vector<Node<std::string>> nodes_expected{
+            Node<std::string>(0, "0"),
+            Node<std::string>(1, "1"),
+            Node<std::string>(2, "2"),
+            Node<std::string>(3, "3"),
+            Node<std::string>(4, "new")};
     EXPECT_EQ(graph.getNodesList(), nodes_expected);
 
     std::vector<std::vector<bool>> adj_matrix_expected;
@@ -223,4 +226,81 @@ TEST_F(GraphMethodsTest, AddNode) {
     adj_matrix_expected.push_back({0, 0, 0, 0, 0});
     adj_matrix_expected.push_back({0, 0, 0, 0, 0});
     EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
+}
+
+TEST_F(GraphMethodsTest, RemoveNodeWorks) {
+    // if the node with the given id exists
+    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
+    Graph<std::string> graph(nodes_data, adj_matrix_disconnected_simple);
+    size_t node_id_to_remove = graph.getNodesList()[2].getId();
+    graph.removeNode(node_id_to_remove);
+
+    std::vector<Node<std::string>> nodes_expected(
+            {Node<std::string>(0, "str"), Node<std::string>(1, "str"), Node<std::string>(3, "str")});
+    EXPECT_EQ(graph.getNodesList(), nodes_expected);
+
+    std::vector<std::pair<size_t, size_t>> edges_expected({{0, 1}});
+    EXPECT_EQ(graph.getEdgesList(), edges_expected);
+
+    std::vector<std::vector<bool>> adj_matrix_expected({{0, 1, 0}, {1, 0, 0}, {0, 0, 0}});
+    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
+
+    // if the node with the given id does not exist
+    graph.removeNode(123);
+    EXPECT_EQ(graph.getNodesList(), nodes_expected);
+    EXPECT_EQ(graph.getEdgesList(), edges_expected);
+    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
+}
+
+TEST_F(GraphMethodsTest, RemoveEdge) {
+    // if the node with the given id exists
+    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
+    Graph<std::string> graph(nodes_data, adj_matrix_disconnected_simple);
+    size_t nodeEdgeIdToRemoveFirst = graph.getNodesList()[0].getId();
+    size_t nodeEdgeIdToRemoveSecond = graph.getNodesList()[1].getId();
+    graph.removeEdge(nodeEdgeIdToRemoveFirst, nodeEdgeIdToRemoveSecond);
+
+
+    std::vector<std::pair<size_t, size_t>> edges_expected({{0, 2}});
+    EXPECT_EQ(graph.getEdgesList(), edges_expected);
+
+    std::vector<std::vector<bool>> adj_matrix_expected({{0, 0, 1, 0}, {0, 0, 0, 0}, {1, 0, 0, 0}, {0, 0, 0, 0}});
+    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
+
+    // if the node with the given id does not exist
+    graph.removeEdge(123,124);
+    EXPECT_EQ(graph.getEdgesList(), edges_expected);
+    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
+}
+
+TEST_F(GraphMethodsTest, AddEdge) {
+    // if the node with the given id exists
+    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
+    Graph<std::string> graph(nodes_data, adj_matrix_disconnected_simple);
+    size_t addNodeFirst = graph.getNodesList()[1].getId();
+    size_t addNodeSecond = graph.getNodesList()[2].getId();
+    graph.addEdge(addNodeFirst,addNodeSecond);
+
+
+    std::vector<std::pair<size_t, size_t>> edges_expected({ {0, 1}, {0, 2}, {1, 2} });
+    EXPECT_EQ(graph.getEdgesList(), edges_expected);
+
+    std::vector<std::vector<bool>> adj_matrix_expected({{0, 1, 1, 0}, {1, 0, 1, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}});
+    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
+
+    // if the node with the given id does not exist
+    graph.addEdge(123,124);
+    EXPECT_EQ(graph.getEdgesList(), edges_expected);
+    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
+}
+
+TEST_F(GraphMethodsTest, HasNode) {
+    // if the node with the given id exists
+    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
+    Graph<std::string> graph(nodes_data, adj_matrix_disconnected_simple);
+    size_t nodeFirst = graph.getNodesList()[1].getId();
+    EXPECT_EQ(graph.hasNode(nodeFirst), true);
+
+    // if the node with the given id does not exist
+    EXPECT_EQ(graph.hasNode(123), false);
 }

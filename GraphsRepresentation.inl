@@ -2,9 +2,37 @@
 #include <utility>
 #include "GraphsRepresentation.h"
 
+template<class T1>
+Node<T1>::Node(int64_t id, T1 data): m_id(id), m_data(data) {}
+
+template<class T1>
+bool Node<T1>::operator==(const Node<T1> &other) const {
+    return m_id == other.m_id;
+}
+
+template<class T1>
+int64_t Node<T1>::getId() const {
+    return m_id;
+}
+
+template<class T1>
+T1 Node<T1>::getData() const {
+    return m_data;
+}
+
+/**
+ * Private constructor for example to create a complement graph (with the same nodes, but different edges).
+ * Needed to avoid recreating vertices.
+ */
+template<typename T>
+Graph<T>::Graph(const std::vector<Node<T>> nodes, const std::vector<std::vector<bool>> adjacency_matrix):
+        m_nodes(nodes), m_adjacency_matrix(adjacency_matrix) {
+    setEdgesList(adjacency_matrix);
+}
+
 template <typename T>
-Graph<T>* Graph<T>::buildCn(const std::vector<T> &nodes, size_t n) {
-    std::vector<std::pair<T, T>> edges_list;
+Graph<T>* Graph<T>::buildCn(const std::vector<Node<T>> &nodes, size_t n){
+    std::vector<std::pair<Node<T>, Node<T>>> edges_list;
     for (int i = 0; i < n-2; ++i){
         edges_list.push_back(std::make_pair(nodes[i], nodes[i+1]));
     }
@@ -14,44 +42,54 @@ Graph<T>* Graph<T>::buildCn(const std::vector<T> &nodes, size_t n) {
 }
 
 template <typename T>
-void Graph<T>::setAdjacencyMatrix(std::vector<T> &nodes, std::vector<std::pair<T, T>> &edges) {
+void Graph<T>::setAdjacencyMatrix(std::vector<Node<T>> &nodes, std::vector<std::pair<size_t, size_t>> &edges) {
     m_adjacency_matrix.resize(nodes.size());
-    for (auto i: m_adjacency_matrix){
-        i.resize(nodes.size());
+    for (auto& line: m_adjacency_matrix) {
+        line.resize(nodes.size());
+        std::fill(line.begin(), line.end(), false); // clear the matrix
     }
-    for (auto i: edges){
-        m_adjacency_matrix[i.first][i.second] = true;
-        m_adjacency_matrix[i.second][i.first] = true;
-
+    for (auto& edge: edges) {
+        m_adjacency_matrix[edge.first][edge.second] = true;
+        m_adjacency_matrix[edge.second][edge.first] = true;
     }
 }
 
 template <typename T>
-Graph<T>::Graph(const std::vector<T> &nodes_list, const std::vector<std::pair<T, T>> &edges_list) {
-    m_nodes = nodes_list;
-    m_edges = edges_list;
-    makeAdjacencyMatrix(nodes_list, edges_list);
-}
-
-template <typename T>
-Graph<T>::Graph(const std::vector<T> &nodes, const std::vector<std::vector<bool>> &adjacency_matrix) {
-    for (const auto& i: adjacency_matrix){
-        m_adjacency_matrix.push_back(i);
-    }
-    for (int i = 0; i < adjacency_matrix.size(); ++i){ // making vector of edges
-        for (int j = 0; j < adjacency_matrix.size(); ++j){
-            if (j == i + 1){
-                i++;
-                j = -1;
-                continue;
-            }
+void Graph<T>::setEdgesList(const std::vector<std::vector<bool>> &adjacency_matrix) {
+    for (int i = 0; i < adjacency_matrix.size(); ++i) {
+        for (int j = i + 1; j < adjacency_matrix.size(); ++j) {
             if (adjacency_matrix[i][j]) {
-                std::pair<T, T> added_pair{nodes[i], nodes[j]};
+                std::pair<size_t, size_t> added_pair{i, j};
                 m_edges.push_back(added_pair);
             }
         }
     }
-    m_nodes = nodes;
+}
+
+template<typename T>
+void Graph<T>::setNodesList(const std::vector<T> &nodes_data) {
+    std::vector<Node<T>> nodes_list;
+    for (auto& data : nodes_data) {
+        Node<T> node(++m_last_id, data);
+        nodes_list.push_back(node);
+    }
+    m_nodes = nodes_list;
+}
+
+template<typename T>
+Graph<T>::Graph(const std::vector<T> &nodes_data, const std::vector<std::pair<size_t, size_t>> &edges_list) {
+    // create nodes with given data
+    setNodesList(nodes_data);
+    // copy edges list
+    m_edges = edges_list;
+    setAdjacencyMatrix(m_nodes, m_edges);
+}
+
+template <typename T>
+Graph<T>::Graph(const std::vector<T> &nodes_data, const std::vector<std::vector<bool>> &adjacency_matrix) {
+    m_adjacency_matrix = adjacency_matrix;
+    setEdgesList(adjacency_matrix);
+    setNodesList(nodes_data);
 }
 
 size_t dfsImpl(
@@ -91,10 +129,10 @@ void dfsForConnectedComponentsImpl(
 }
 
 template<typename T>
-std::vector<std::vector<T>> Graph<T>::getConnectedComponentsImpl(
+std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponentsImpl(
         const std::vector<std::vector<size_t>>& adjacency_list,
         std::map<size_t, bool>& visited) const {
-    std::vector<std::vector<T>> components;
+    std::vector<std::vector<Node<T>>> components;
 
     std::vector<size_t> remaining_nodes_indices(m_nodes.size());
     // fills the range [first, last) with sequentially increasing values, starting with value
@@ -104,7 +142,7 @@ std::vector<std::vector<T>> Graph<T>::getConnectedComponentsImpl(
     while (!remaining_nodes_indices.empty()) {
         dfsForConnectedComponentsImpl(remaining_nodes_indices[0], visited, adjacency_list, current_component);
         // convert indices to vertices before adding to vector
-        std::vector<T> current_component_nodes;
+        std::vector<Node<T>> current_component_nodes;
         for (auto i : current_component) {
             current_component_nodes.push_back(m_nodes[i]);
         }
@@ -123,6 +161,9 @@ std::vector<std::vector<T>> Graph<T>::getConnectedComponentsImpl(
     return components;
 }
 
+/**
+ * @return degree list in descending order
+ */
 template<typename T>
 std::vector<size_t> Graph<T>::getDegreeList() const {
     // vertex degree = sum of ones in the matrix row
@@ -161,7 +202,7 @@ bool Graph<T>::isConnected() const {
 }
 
 template<typename T>
-std::vector<std::vector<T>> Graph<T>::getConnectedComponents() const {
+std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponents() const {
     auto adjacency_list = getAdjacencyList();
     std::map<size_t, bool> visited;
     for (auto index = 0; index < m_nodes.size(); index++) {
@@ -196,23 +237,100 @@ std::vector<std::vector<bool>> Graph<T>::getAdjacencyMatrix() const {
 }
 
 template<typename T>
-std::vector<T> Graph<T>::getNodesList() const {
+std::vector<Node<T>> Graph<T>::getNodesList() const {
     return m_nodes;
 }
 
 template<typename T>
-void Graph<T>::addNode(const T& node) {
-    m_nodes.push_back(node);
+std::vector<std::pair<size_t, size_t>> Graph<T>::getEdgesList() const {
+    return m_edges;
+}
+
+/**
+ * @return id of the added node
+ */
+template<typename T>
+int64_t Graph<T>::addNode(T& node_data) {
+    Node<T> new_node(++m_last_id, node_data);
+    m_nodes.push_back(new_node);
     // change adjacency matrix
     m_adjacency_matrix.push_back(std::vector<bool>(m_nodes.size() - 1, false)); // add new line for new node
     for (auto& line : m_adjacency_matrix) {
         line.resize(line.size() + 1, false); // add new column, initialize new column with false
     }
+    return m_last_id;
 }
 
 template<typename T>
-void Graph<T>::addEdge(const T& nodeFirst, const T& nodeSecond)
-{
+void Graph<T>::removeNode(int64_t id) {
+    // remove node from nodes list
+    size_t node_index_to_remove = -1;
+    for (int i = 0; i < m_nodes.size(); i++) {
+        if (m_nodes[i].m_id == id) {
+            m_nodes.erase(m_nodes.begin() + i);
+            node_index_to_remove = i;
+            break;
+        }
+    }
 
+    if (node_index_to_remove == -1) {
+        // node with this id is not found
+        return;
+    }
+
+    // change edges list
+    auto it = m_edges.begin();
+    while(it != m_edges.end()) {
+        if((*it).first == node_index_to_remove && (*it).second == node_index_to_remove) {
+            it = m_edges.erase(it);
+        } else {
+            it++;
+        }
+    }
+
+    // recalculate adjacency matrix
+    setAdjacencyMatrix(m_nodes, m_edges);
 }
+
+template<typename T>
+void Graph<T>::addEdge(int64_t idFirst, int64_t idSecond)
+{
+    m_edges.push_back(std::make_pair(m_nodes[idFirst], m_nodes[idSecond]));
+
+    // recalculate adjacency matrix
+    setAdjacencyMatrix(m_nodes, m_edges);
+}
+
+template<typename T>
+void Graph<T>::removeEdge(int64_t idFirst, int64_t idSecond)
+{
+    auto it = m_edges.begin();
+    while(it != m_edges.end()) {
+        if((*it).first == idFirst && (*it).second == idSecond) {
+            it = m_edges.erase(it);
+        } else {
+            it++;
+        }
+    }
+
+    // recalculate adjacency matrix
+    setAdjacencyMatrix(m_nodes, m_edges);
+}
+
+
+template<typename T>
+bool Graph<T>::hasNode(int64_t id)
+{
+    size_t node_index_to_remove = -1;
+    for (int i = 0; i < m_nodes.size(); i++) {
+        if (m_nodes[i].m_id == id) {
+            return true;
+        }
+    }
+
+    if (node_index_to_remove == -1) {
+        return false;
+    }
+}
+
 

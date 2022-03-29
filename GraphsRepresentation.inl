@@ -295,9 +295,26 @@ void Graph<T>::removeNode(int64_t id) {
 template<typename T>
 void Graph<T>::addEdge(int64_t idFirst, int64_t idSecond)
 {
-    m_edges.push_back(std::make_pair(m_nodes[idFirst], m_nodes[idSecond]));
+    bool has_edge = false;
+    auto it = m_edges.begin();
+    while(it != m_edges.end()) {
+        if((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
+            has_edge = true;
+        } else {
+            it++;
+        }
+    }
 
-    // recalculate adjacency matrix
+    if(has_edge == false)
+    {
+        m_edges.push_back(std::make_pair(m_nodes[idFirst], m_nodes[idSecond]));
+    }
+    else
+    {
+        // the edge exists
+        return;
+    }
+
     setAdjacencyMatrix(m_nodes, m_edges);
 }
 
@@ -306,7 +323,7 @@ void Graph<T>::removeEdge(int64_t idFirst, int64_t idSecond)
 {
     auto it = m_edges.begin();
     while(it != m_edges.end()) {
-        if((*it).first == idFirst && (*it).second == idSecond) {
+        if((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
             it = m_edges.erase(it);
         } else {
             it++;
@@ -321,14 +338,14 @@ void Graph<T>::removeEdge(int64_t idFirst, int64_t idSecond)
 template<typename T>
 bool Graph<T>::hasNode(int64_t id)
 {
-    size_t node_index_to_remove = -1;
+    size_t has_node_index = -1;
     for (int i = 0; i < m_nodes.size(); i++) {
         if (m_nodes[i].m_id == id) {
             return true;
         }
     }
 
-    if (node_index_to_remove == -1) {
+    if (has_node_index == -1) {
         return false;
     }
 }

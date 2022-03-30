@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../GraphsRepresentation.h"
+#include "../include/GraphsRepresentation.h"
 
 TEST(BuildGraph, EmptyNodesAndNonEmptyEdges) {
     bool exception_caught = false;

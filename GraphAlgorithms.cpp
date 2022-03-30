@@ -1,4 +1,4 @@
-#include "GraphAlgorithms.h"
+#include "include/GraphAlgorithms.h"
 
 size_t dfsImpl(
         const size_t node_index,

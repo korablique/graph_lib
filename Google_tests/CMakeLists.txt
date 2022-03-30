@@ -8,7 +8,6 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 # 'Google_Tests_run' is the target name
 # then there are source files with tests
 add_executable(Google_Tests_run
-        ../GraphsMethods.cpp
         ../GraphAlgorithms.cpp
         graph_methods_test.cpp
         graph_build_test.cpp

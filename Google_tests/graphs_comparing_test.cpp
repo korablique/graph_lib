@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../GraphsRepresentation.h"
+#include "../include/GraphsRepresentation.h"
 
 TEST(GraphsComparing, CompareEqualGraphs) {
     std::vector<std::string> nodes_data({"one", "two"});

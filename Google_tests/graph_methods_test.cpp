@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../GraphsRepresentation.h"
+#include "../include/GraphsRepresentation.h"
 
 class GraphMethodsTest : public ::testing::Test {
 protected:

@@ -3,24 +3,6 @@
 #include <unordered_set>
 #include "GraphAlgorithms.h"
 
-template<class T1>
-Node<T1>::Node(int64_t id, T1 data): m_id(id), m_data(data) {}
-
-template<class T1>
-bool Node<T1>::operator==(const Node<T1> &other) const {
-    return m_id == other.m_id;
-}
-
-template<class T1>
-int64_t Node<T1>::getId() const {
-    return m_id;
-}
-
-template<class T1>
-T1 Node<T1>::getData() const {
-    return m_data;
-}
-
 /**
  * Private constructor for example to create a complement graph (with the same nodes, but different edges).
  * Needed to avoid recreating vertices.

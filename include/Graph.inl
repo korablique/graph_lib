@@ -9,7 +9,7 @@
  * Needed to avoid recreating vertices.
  */
 template<typename T>
-Graph<T>::Graph(const std::vector<Node<T>> nodes, const std::vector<std::vector<bool>> adjacency_matrix):
+Graph<T>::Graph(const std::vector<Node<T>> &nodes, const std::vector<std::vector<bool>> &adjacency_matrix):
         m_nodes(nodes), m_adjacency_matrix(adjacency_matrix) {
     setEdgesList(adjacency_matrix);
 }
@@ -101,7 +101,7 @@ std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponentsImpl(
         components.push_back(current_component_nodes);
         current_component_nodes.clear();
 
-        for (auto item : current_component) {
+        for (auto& item : current_component) {
             // remove() moves the elements to be removed to the end of vector
             // and returns the iterator to the first element to be removed.
             // erase() removes all elements from this iterator to remaining_nodes.end()
@@ -235,8 +235,8 @@ void Graph<T>::removeNode(int64_t id) {
 
     // change edges list
     auto it = m_edges.begin();
-    while(it != m_edges.end()) {
-        if((*it).first == node_index_to_remove || (*it).second == node_index_to_remove) {
+    while (it != m_edges.end()) {
+        if ((*it).first == node_index_to_remove || (*it).second == node_index_to_remove) {
             it = m_edges.erase(it);
         } else {
             it++;

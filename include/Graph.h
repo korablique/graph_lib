@@ -14,7 +14,7 @@ private:
     std::vector<std::pair<size_t, size_t>> m_edges;
     std::vector<std::vector<bool>> m_adjacency_matrix;
 
-    Graph(const std::vector<Node<T>> nodes, const std::vector<std::vector<bool>> m_adjacency_matrix);
+    Graph(const std::vector<Node<T>> &nodes, const std::vector<std::vector<bool>> &m_adjacency_matrix);
 
     void setNodesList(const std::vector<T> &nodes_data);
     void setEdgesList(const std::vector<std::vector<bool>> &adjacency_matrix);

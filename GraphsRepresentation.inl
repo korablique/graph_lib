@@ -1,6 +1,8 @@
 #include <vector>
 #include <utility>
 #include <unordered_set>
+#include <stack>
+#include <algorithm>
 #include "GraphAlgorithms.h"
 
 template<class T1>

@@ -63,6 +63,10 @@ public:
     bool isConnected() const;
     std::vector<std::vector<Node<T2>>> getConnectedComponents() const;
     Graph<T2> getComplementGraph() const;
+    bool Is_Euleran_Path();
+    bool Is_Euleran_Cycle();
+    std::vector<int> Search_Euleran_Graph();
+    bool Is_Bipartied();
 };
 
 #include "GraphsRepresentation.inl"

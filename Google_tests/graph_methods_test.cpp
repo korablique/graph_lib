@@ -385,3 +385,18 @@ TEST_F(GraphMethodsTest, HasEdge) {
     // if the node with the given id does not exist
     EXPECT_EQ(graph.hasEdge(123, 124), false);
 }
+
+TEST_F(GraphMethodsTest, IsEuleranPath) {
+    // if the node with the given id exists
+    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
+    Graph<std::string> graph = Graph<std::string>::buildGraph(nodes_data, adj_matrix_disconnected_simple);
+    EXPECT_EQ(graph.Is_Euleran_Path(), true);
+}
+
+TEST_F(GraphMethodsTest, IsEuleranCycle) {
+    // if the node with the given id exists
+    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
+    Graph<std::string> graph = Graph<std::string>::buildGraph(nodes_data, adj_matrix_disconnected_simple);
+    EXPECT_EQ(graph.Is_Euleran_Cycle(), false);
+}
+

@@ -65,7 +65,7 @@ public:
     Graph<T2> getComplementGraph() const;
     bool Is_Euleran_Path();
     bool Is_Euleran_Cycle();
-    std::vector<int> Euleran_Graph();
+    std::vector<int> Search_Euleran_Graph();
     bool Is_Bipartied();
 };
 

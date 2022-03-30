@@ -26,6 +26,8 @@ T1 Node<T1>::getData() const {
  * Private constructor for example to create a complement graph (with the same nodes, but different edges).
  * Needed to avoid recreating vertices.
  */
+
+
 template<typename T>
 Graph<T>::Graph(const std::vector<Node<T>> nodes, const std::vector<std::vector<bool>> adjacency_matrix):
         m_nodes(nodes), m_adjacency_matrix(adjacency_matrix) {
@@ -414,6 +416,9 @@ bool Graph<T>::hasNode(int64_t id)
     if (has_node_index == -1) {
         return false;
     }
+    else{
+        return true;
+    }
 }
 
 template<typename T>
@@ -439,8 +444,8 @@ bool Graph<T>::hasEdge(int64_t idFirst, int64_t idSecond)
 
 template<typename T>
 bool Graph<T>::Is_Euleran_Path(){ // проверка на эйлеров путь
-    std::vector<int> degree_list = getDegreeList();
-    std::vector<std::vector<int>> connected_component = getConnectedComponents();
+    std::vector<size_t> degree_list = getDegreeList();
+    auto connected_component = getConnectedComponents();
     int Odd_Vertix = 0; //счетчик нечетных вершин
     int Complicated_Graph_Connected_Component = 0; // счетчик сложных компонент связности
     for (int i = 0; i < degree_list.size(); i++) {
@@ -451,6 +456,11 @@ bool Graph<T>::Is_Euleran_Path(){ // проверка на эйлеров пут
             return false;
         }
     }
+
+    if(Odd_Vertix == 1){
+        return false;
+    }
+
     for (int i = 0; i < connected_component.size(); i++) {
         if (connected_component[i].size() > 1) {
             Complicated_Graph_Connected_Component++;
@@ -464,7 +474,7 @@ bool Graph<T>::Is_Euleran_Path(){ // проверка на эйлеров пут
 
 template <typename T>
 bool Graph<T>::Is_Euleran_Cycle() { //проверка на Эйлеров цикл
-    std::vector<int> degree_list = getDegreeList();
+    std::vector<size_t> degree_list = getDegreeList();
     bool is_euleran = Is_Euleran_Path();
     if (is_euleran == 0) {
         return false;
@@ -478,15 +488,22 @@ bool Graph<T>::Is_Euleran_Cycle() { //проверка на Эйлеров ци�
 }
 
 template<typename T>
-std::vector<int> Graph<T>::Euleran_Graph() {
-    std::vector<std::vector<int>> connected_components = getConnectedComponents();
+std::vector<int> Graph<T>::Search_Euleran_Graph() {
+    std::vector<int> answer;
+    answer.resize(0);
+    if(Is_Euleran_Path() == false){
+        return answer;
+    }
+    auto connected_components = getConnectedComponents();
     int Start_Vertix = 0;
+    std::vector<size_t> degree_list = getDegreeList();
     std::stack<int> Search_Path;
     int current_Vertix = 0;
     for (int i = 0; i < connected_components.size(); i++) { // поиск стартовой вершины
         if (connected_components[i].size() > 1) {
             for (int j = 0; j < connected_components[i].size(); j++) {
-                if (connected_components[i][j] % 2 == 1) {
+                Node<T> Vert = connected_components[i][j];
+                if (degree_list[Vert.m_id] % 2 == 1) { //
                     Start_Vertix = connected_components[i][j];
                     break;
                 }
@@ -496,7 +513,6 @@ std::vector<int> Graph<T>::Euleran_Graph() {
 
     Search_Path.push(Start_Vertix);
     bool found = false;
-    std::vector<int> answer;
     while (Search_Path.empty() == 0) {
         found = false;
         current_Vertix = Search_Path.top();
@@ -517,7 +533,7 @@ std::vector<int> Graph<T>::Euleran_Graph() {
     return answer;
 }
 
-template<typename T>
+template <typename T>
 bool Graph<T>::Is_Bipartied() {
     std::vector<std::vector<int>> connected_component = getConnectedComponents();
     std::stack<int> Search_Path;

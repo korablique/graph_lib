@@ -38,13 +38,17 @@ private:
             const std::vector<std::vector<size_t>>& adjacency_list,
             std::map<size_t, bool>& visited) const;
 
-public:
     Graph(const std::vector<T2>& nodes_data, const std::vector<std::pair<size_t, size_t>>& edges_list);
     Graph(const std::vector<T2> &nodes_data, const std::vector<std::vector<bool>> &adjacency_matrix);
+public:
+    static Graph<T2> buildGraph(const std::vector<T2>& nodes_data, const std::vector<std::pair<size_t, size_t>>& edges_list);
+    static Graph<T2> buildGraph(const std::vector<T2>& nodes_data, const std::vector<std::vector<bool>>& adjacency_matrix);
 
     Graph<T2>* buildCn(const std::vector<Node<T2>> &nodes, size_t n);
 
-    int64_t addNode(T2& node_data);
+    bool operator==(const Graph<T2>& other) const;
+
+    int64_t addNode(const T2& node_data);
     void removeNode(int64_t id);
     void addEdge(int64_t idFirst, int64_t idSecond);
     void removeEdge(int64_t idFirst, int64_t idSecond);

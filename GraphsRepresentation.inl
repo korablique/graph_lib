@@ -1,6 +1,7 @@
 #include <vector>
 #include <utility>
-#include "GraphsRepresentation.h"
+#include <unordered_set>
+#include "GraphAlgorithms.h"
 
 template<class T1>
 Node<T1>::Node(int64_t id, T1 data): m_id(id), m_data(data) {}
@@ -92,42 +93,6 @@ Graph<T>::Graph(const std::vector<T> &nodes_data, const std::vector<std::vector<
     setNodesList(nodes_data);
 }
 
-size_t dfsImpl(
-        const size_t node_index,
-        std::map<size_t, bool>& visited,
-        const std::vector<std::vector<size_t>>& adjacency_list) {
-    size_t visited_vertices = 1;
-    visited[node_index] = true;
-    for (auto& v : adjacency_list[node_index]) {
-        if (!visited[v]) {
-            visited_vertices += dfsImpl(v, visited, adjacency_list);
-        }
-    }
-    return visited_vertices;
-}
-
-size_t dfs(const std::vector<std::vector<size_t>>& adjacency_list) {
-    std::map<size_t, bool> visited;
-    for (auto index = 0; index < adjacency_list.size(); ++index) {
-        visited.insert({index, false});
-    }
-    return dfsImpl(0, visited, adjacency_list);
-}
-
-void dfsForConnectedComponentsImpl(
-        size_t node_index,
-        std::map<size_t, bool>& visited,
-        const std::vector<std::vector<size_t>>& adjacency_list,
-        std::vector<size_t>& connected_component) {
-    visited[node_index] = true;
-    connected_component.push_back(node_index);
-    for (auto& v : adjacency_list[node_index]) {
-        if (!visited[v]) {
-            dfsForConnectedComponentsImpl(v, visited, adjacency_list, connected_component);
-        }
-    }
-}
-
 template<typename T>
 std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponentsImpl(
         const std::vector<std::vector<size_t>>& adjacency_list,
@@ -196,6 +161,9 @@ std::vector<std::vector<size_t>> Graph<T>::getAdjacencyList() const {
 
 template<typename T>
 bool Graph<T>::isConnected() const {
+    if (m_nodes.empty()) {
+        return false; // graph with no vertices is considered disconnected
+    }
     auto adjacency_list = getAdjacencyList();
     size_t vertices_reached = dfs(adjacency_list);
     return vertices_reached == m_adjacency_matrix.size();
@@ -250,7 +218,7 @@ std::vector<std::pair<size_t, size_t>> Graph<T>::getEdgesList() const {
  * @return id of the added node
  */
 template<typename T>
-int64_t Graph<T>::addNode(T& node_data) {
+int64_t Graph<T>::addNode(const T& node_data) {
     Node<T> new_node(++m_last_id, node_data);
     m_nodes.push_back(new_node);
     // change adjacency matrix
@@ -281,7 +249,7 @@ void Graph<T>::removeNode(int64_t id) {
     // change edges list
     auto it = m_edges.begin();
     while(it != m_edges.end()) {
-        if((*it).first == node_index_to_remove && (*it).second == node_index_to_remove) {
+        if((*it).first == node_index_to_remove || (*it).second == node_index_to_remove) {
             it = m_edges.erase(it);
         } else {
             it++;
@@ -292,15 +260,136 @@ void Graph<T>::removeNode(int64_t id) {
     setAdjacencyMatrix(m_nodes, m_edges);
 }
 
+template<class T>
+Graph<T> Graph<T>::buildGraph(const std::vector<T> &nodes_data, const std::vector<std::pair<size_t, size_t>> &edges_list) {
+    for (auto& edge : edges_list) {
+        if (edge.first >= nodes_data.size() || edge.second >= nodes_data.size()) {
+            throw std::logic_error("Node index is out of range");
+        }
+    }
+    return Graph<T>(nodes_data, edges_list);
+}
 
+template<class T>
+Graph<T> Graph<T>::buildGraph(const std::vector<T> &nodes_data, const std::vector<std::vector<bool>> &adjacency_matrix) {
+    if (nodes_data.empty() && !adjacency_matrix.empty()) {
+        throw std::logic_error("Nodes list is empty while adjacency matrix is not");
+    }
+    if (!nodes_data.empty() && adjacency_matrix.empty()) {
+        throw std::logic_error("Adjacency matrix is empty while nodes list is not");
+    }
+
+    if (!adjacency_matrix.empty()) {
+        bool is_square = adjacency_matrix.size() == adjacency_matrix[0].size();
+        if (!is_square) {
+            throw std::logic_error("Matrix is not square");
+        }
+    }
+
+    bool matrix_size_fits_nodes_number = nodes_data.size() == adjacency_matrix.size();
+    if (!matrix_size_fits_nodes_number) {
+        throw std::logic_error("Matrix does size does not fit nodes number");
+    }
+
+    for (int i = 0; i < adjacency_matrix.size(); i++) {
+        for (int j = i + 1; j < adjacency_matrix.size(); j++) {
+            if (adjacency_matrix[i][j] != adjacency_matrix[j][i]) {
+                throw std::logic_error("Matrix is not symmetric");
+            }
+        }
+    }
+
+    for (int i = 0; i < adjacency_matrix.size(); i++) {
+        if (adjacency_matrix[i][i] != 0) {
+            throw std::logic_error("Matrix diagonal contains non-zero elements");
+        }
+    }
+
+    return Graph<T>(nodes_data, adjacency_matrix);
+}
+
+template<class T>
+bool Graph<T>::operator==(const Graph<T> &other) const {
+    // compare data in the nodes
+    std::unordered_set<T> nodes_data;
+    for (const auto& node : m_nodes) {
+        nodes_data.insert(node.m_data);
+    }
+    std::unordered_set<T> other_nodes_data;
+    for (const auto& node : other.getNodesList()) {
+        other_nodes_data.insert(node.m_data);
+    }
+    if (nodes_data != other_nodes_data) {
+        return false;
+    }
+
+    // compare edges list
+    auto other_nodes = other.getNodesList();
+    auto other_edges = other.getEdgesList();
+    if (m_edges.size() != other_edges.size()) {
+        return false;
+    }
+
+    for (auto& edge : m_edges) {
+        bool edge_found = false;
+        for (auto& other_edge : other_edges) {
+            // check whether the data at the vertices that form an edge in this graph
+            // match the data at the vertices that form an edge of another graph
+            if ((m_nodes[edge.first].m_data == other_nodes[other_edge.first].m_data
+                        || m_nodes[edge.first].m_data == other_nodes[other_edge.second].m_data)
+                    && (m_nodes[edge.second].m_data == other_nodes[other_edge.first].m_data
+                        || m_nodes[edge.second].m_data == other_nodes[other_edge.second].m_data)) {
+                edge_found = true;
+                break;
+            }
+        }
+        if (!edge_found) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<typename T>
+void Graph<T>::addEdge(int64_t idFirst, int64_t idSecond) {
+    bool has_edge = false;
+    auto it = m_edges.begin();
+    while (it != m_edges.end()) {
+        if ((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
+            has_edge = true;
+        } else {
+            it++;
+        }
+    }
+
+    if (!has_edge) {
+        // find indices of the nodes by their ids
+        int index1 = -1, index2 = -1;
+        for (int i = 0; i < m_nodes.size(); i++) {
+            if (m_nodes[i].getId() == idFirst) {
+                index1 = i;
+            } else if (m_nodes[i].getId() == idSecond) {
+                index2 = i;
+            }
+        }
+        if (index1 == -1 || index2 == -1) {
+            // there are no nodes with the given ids
+            return;
+        }
+
+        m_edges.push_back(std::make_pair(index1, index2));
+        setAdjacencyMatrix(m_nodes, m_edges);
+    }
+}
 
 template<typename T>
 void Graph<T>::removeEdge(int64_t idFirst, int64_t idSecond)
 {
     auto it = m_edges.begin();
-    while(it != m_edges.end()) {
-        if((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
+    while (it != m_edges.end()) {
+        if ((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
             it = m_edges.erase(it);
+            break;
         } else {
             it++;
         }
@@ -350,18 +439,4 @@ bool Graph<T>::hasEdge(int64_t idFirst, int64_t idSecond)
     }
 }
 
-template<typename T>
-void Graph<T>::addEdge(int64_t idFirst, int64_t idSecond)
-{
-    auto it = m_edges.begin();
-    while(it != m_edges.end()) {
-        if((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
-            it = m_edges.erase(it);
-        } else {
-            it++;
-        }
-    }
 
-    // recalculate adjacency matrix
-    setAdjacencyMatrix(m_nodes, m_edges);
-}

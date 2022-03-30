@@ -39,7 +39,7 @@ private:
             std::map<size_t, bool>& visited) const;
 
     Graph(const std::vector<T2>& nodes_data, const std::vector<std::pair<size_t, size_t>>& edges_list);
-    Graph(const std::vector<T2> &nodes_data, const std::vector<std::vector<bool>> &adjacency_matrix);
+
 public:
     static Graph<T2> buildGraph(const std::vector<T2>& nodes_data, const std::vector<std::pair<size_t, size_t>>& edges_list);
     static Graph<T2> buildGraph(const std::vector<T2>& nodes_data, const std::vector<std::vector<bool>>& adjacency_matrix);
@@ -63,6 +63,8 @@ public:
     bool isConnected() const;
     std::vector<std::vector<Node<T2>>> getConnectedComponents() const;
     Graph<T2> getComplementGraph() const;
+
+    Graph(const std::vector<T2> &nodes_data, const std::vector<std::vector<bool>> &adjacency_matrix);
 };
 
 #include "GraphsRepresentation.inl"

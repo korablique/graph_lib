@@ -426,7 +426,7 @@ bool Graph<T>::hasEdge(int64_t idFirst, int64_t idSecond)
     while(it != m_edges.end()) {
         if((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
             has_edge = true;
-            return true;
+            break;
         } else {
             it++;
         }

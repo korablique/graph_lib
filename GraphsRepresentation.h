@@ -34,7 +34,7 @@ private:
     void setNodesList(const std::vector<T2> &nodes_data);
     void setEdgesList(const std::vector<std::vector<bool>> &adjacency_matrix);
     void setAdjacencyMatrix(std::vector<Node<T2>> &nodes, std::vector<std::pair<size_t, size_t>> &edges);
-    std::vector<std::vector<Node<T2>>> getConnectedComponentsImpl(
+    std::vector<std::vector<Node<T2>>> connected_components(
             const std::vector<std::vector<size_t>>& adjacency_list,
             std::map<size_t, bool>& visited) const;
 
@@ -63,6 +63,10 @@ public:
     bool isConnected() const;
     std::vector<std::vector<Node<T2>>> getConnectedComponents() const;
     Graph<T2> getComplementGraph() const;
+    bool Is_Euleran_Path();
+    bool Is_Euleran_Cycle();
+    std::vector<int> Euleran_Graph();
+    bool Is_Bipartied();
 };
 
 #include "GraphsRepresentation.inl"

@@ -97,7 +97,7 @@ Graph<T>::Graph(const std::vector<T> &nodes_data, const std::vector<std::vector<
 }
 
 template<typename T>
-std::vector<std::vector<Node<T>>> Graph<T>::connected_components(
+std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponentsImpl(
         const std::vector<std::vector<size_t>>& adjacency_list,
         std::map<size_t, bool>& visited) const {
     std::vector<std::vector<Node<T>>> components;
@@ -179,7 +179,7 @@ std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponents() const {
     for (auto index = 0; index < m_nodes.size(); index++) {
         visited.insert({index, false});
     }
-    return connected_components(adjacency_list, visited);
+    return getConnectedComponentsImpl(adjacency_list, visited);
 }
 
 template<typename T>

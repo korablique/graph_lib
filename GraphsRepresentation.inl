@@ -292,31 +292,7 @@ void Graph<T>::removeNode(int64_t id) {
     setAdjacencyMatrix(m_nodes, m_edges);
 }
 
-template<typename T>
-void Graph<T>::addEdge(int64_t idFirst, int64_t idSecond)
-{
-    bool has_edge = false;
-    auto it = m_edges.begin();
-    while(it != m_edges.end()) {
-        if((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
-            has_edge = true;
-        } else {
-            it++;
-        }
-    }
 
-    if(has_edge == false)
-    {
-        m_edges.push_back(std::make_pair(m_nodes[idFirst], m_nodes[idSecond]));
-    }
-    else
-    {
-        // the edge exists
-        return;
-    }
-
-    setAdjacencyMatrix(m_nodes, m_edges);
-}
 
 template<typename T>
 void Graph<T>::removeEdge(int64_t idFirst, int64_t idSecond)
@@ -336,8 +312,7 @@ void Graph<T>::removeEdge(int64_t idFirst, int64_t idSecond)
 
 
 template<typename T>
-bool Graph<T>::hasNode(int64_t id)
-{
+bool Graph<T>::hasNode(int64_t id) {
     size_t has_node_index = -1;
     for (int i = 0; i < m_nodes.size(); i++) {
         if (m_nodes[i].m_id == id) {
@@ -348,6 +323,45 @@ bool Graph<T>::hasNode(int64_t id)
     if (has_node_index == -1) {
         return false;
     }
+    else
+    {
+        return true;
+    }
 }
 
+template<typename T>
+bool Graph<T>::hasEdge(int64_t idFirst, int64_t idSecond)
+{
+    auto it = m_edges.begin();
+    bool has_edge = false;
+    while(it != m_edges.end()) {
+        if((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
+            has_edge = true;
+            return true;
+        } else {
+            it++;
+        }
+    }
+    if(has_edge == false){
+        return false;
+    }
+    else{
+        return true;
+    }
+}
 
+template<typename T>
+void Graph<T>::addEdge(int64_t idFirst, int64_t idSecond)
+{
+    auto it = m_edges.begin();
+    while(it != m_edges.end()) {
+        if((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
+            it = m_edges.erase(it);
+        } else {
+            it++;
+        }
+    }
+
+    // recalculate adjacency matrix
+    setAdjacencyMatrix(m_nodes, m_edges);
+}

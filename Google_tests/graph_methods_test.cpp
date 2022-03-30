@@ -273,29 +273,8 @@ TEST_F(GraphMethodsTest, RemoveEdge) {
     EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
 }
 
-TEST_F(GraphMethodsTest, AddEdge) {
-    // if the node with the given id exists
-    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
-    Graph<std::string> graph(nodes_data, adj_matrix_disconnected_simple);
-    size_t addNodeFirst = graph.getNodesList()[1].getId();
-    size_t addNodeSecond = graph.getNodesList()[2].getId();
-    graph.addEdge(addNodeFirst,addNodeSecond);
-
-
-    std::vector<std::pair<size_t, size_t>> edges_expected({ {0, 1}, {0, 2}, {1, 2} });
-    EXPECT_EQ(graph.getEdgesList(), edges_expected);
-
-    std::vector<std::vector<bool>> adj_matrix_expected({{0, 1, 1, 0}, {1, 0, 1, 0}, {1, 1, 0, 0}, {0, 0, 0, 0}});
-    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
-
-    // if the node with the given id does not exist
-    graph.addEdge(123,124);
-    EXPECT_EQ(graph.getEdgesList(), edges_expected);
-    EXPECT_EQ(graph.getAdjacencyMatrix(), adj_matrix_expected);
-}
-
 TEST_F(GraphMethodsTest, HasNode) {
-    // if the node with the given id exists
+
     std::vector<std::string> nodes_data({"str", "str", "str", "str"});
     Graph<std::string> graph(nodes_data, adj_matrix_disconnected_simple);
     size_t nodeFirst = graph.getNodesList()[1].getId();
@@ -303,4 +282,16 @@ TEST_F(GraphMethodsTest, HasNode) {
 
     // if the node with the given id does not exist
     EXPECT_EQ(graph.hasNode(123), false);
+}
+
+TEST_F(GraphMethodsTest, HasEdge) {
+
+    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
+    Graph<std::string> graph(nodes_data, adj_matrix_disconnected_simple);
+    size_t nodeFirst = graph.getNodesList()[0].getId();
+    size_t nodeSecond = graph.getNodesList()[1].getId();
+    EXPECT_EQ(graph.hasEdge(nodeFirst, nodeSecond), true);
+
+    // if the node with the given id does not exist
+    EXPECT_EQ(graph.hasEdge(123, 124), false);
 }

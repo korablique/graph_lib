@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../GraphsRepresentation.h"
+#include "../include/Graph.h"
 
 TEST(BuildGraph, EmptyNodesAndNonEmptyEdges) {
     bool exception_caught = false;
@@ -96,4 +96,11 @@ TEST(BuildGraph, AdjMatrixDiagonalContainsNonZeroElements) {
         exception_caught = true;
     }
     EXPECT_TRUE(exception_caught);
+}
+
+TEST(BuildCn, BuildCnWorks) {
+    std::vector<std::string> nodes({"one", "two", "three"});
+    Graph<std::string> cycle = Graph<std::string>::buildCn(nodes);
+    std::vector<std::pair<size_t, size_t>> edges_expected({{0, 1}, {1, 2}, {2, 0}});
+    EXPECT_EQ(cycle.getEdgesList(), edges_expected);
 }

@@ -2,44 +2,31 @@
 #include <utility>
 #include <unordered_set>
 #include "GraphAlgorithms.h"
-
-template<class T1>
-Node<T1>::Node(int64_t id, T1 data): m_id(id), m_data(data) {}
-
-template<class T1>
-bool Node<T1>::operator==(const Node<T1> &other) const {
-    return m_id == other.m_id;
-}
-
-template<class T1>
-int64_t Node<T1>::getId() const {
-    return m_id;
-}
-
-template<class T1>
-T1 Node<T1>::getData() const {
-    return m_data;
-}
+#include "Graph.h"
 
 /**
  * Private constructor for example to create a complement graph (with the same nodes, but different edges).
  * Needed to avoid recreating vertices.
  */
 template<typename T>
-Graph<T>::Graph(const std::vector<Node<T>> nodes, const std::vector<std::vector<bool>> adjacency_matrix):
+Graph<T>::Graph(const std::vector<Node<T>> &nodes, const std::vector<std::vector<bool>> &adjacency_matrix):
         m_nodes(nodes), m_adjacency_matrix(adjacency_matrix) {
     setEdgesList(adjacency_matrix);
 }
 
-template <typename T>
-Graph<T>* Graph<T>::buildCn(const std::vector<Node<T>> &nodes, size_t n){
-    std::vector<std::pair<Node<T>, Node<T>>> edges_list;
-    for (int i = 0; i < n-2; ++i){
-        edges_list.push_back(std::make_pair(nodes[i], nodes[i+1]));
+/**
+ * @param nodes nodes must be in the order you want them to be in the cycle
+ * @return a cycle of the given nodes
+ */
+
+template<class T>
+Graph<T> Graph<T>::buildCn(const std::vector<T> &nodes) {
+    std::vector<std::pair<size_t, size_t>> edges_list;
+    for (int i = 0; i < nodes.size() - 1; ++i){
+        edges_list.push_back(std::make_pair(i, i + 1));
     }
-    edges_list.push_back(nodes[n-1], nodes[n]);
-    Graph<T> result = Graph(&nodes, &edges_list);
-    return &result;
+    edges_list.push_back(std::make_pair(nodes.size() - 1, 0));
+    return Graph<T>::buildGraph(nodes, edges_list);
 }
 
 template <typename T>
@@ -114,7 +101,7 @@ std::vector<std::vector<Node<T>>> Graph<T>::getConnectedComponentsImpl(
         components.push_back(current_component_nodes);
         current_component_nodes.clear();
 
-        for (auto item : current_component) {
+        for (auto& item : current_component) {
             // remove() moves the elements to be removed to the end of vector
             // and returns the iterator to the first element to be removed.
             // erase() removes all elements from this iterator to remaining_nodes.end()
@@ -248,8 +235,8 @@ void Graph<T>::removeNode(int64_t id) {
 
     // change edges list
     auto it = m_edges.begin();
-    while(it != m_edges.end()) {
-        if((*it).first == node_index_to_remove || (*it).second == node_index_to_remove) {
+    while (it != m_edges.end()) {
+        if ((*it).first == node_index_to_remove || (*it).second == node_index_to_remove) {
             it = m_edges.erase(it);
         } else {
             it++;

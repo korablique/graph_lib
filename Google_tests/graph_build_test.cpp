@@ -97,3 +97,10 @@ TEST(BuildGraph, AdjMatrixDiagonalContainsNonZeroElements) {
     }
     EXPECT_TRUE(exception_caught);
 }
+
+TEST(BuildCn, BuildCnWorks) {
+    std::vector<std::string> nodes({"one", "two", "three"});
+    Graph<std::string> cycle = Graph<std::string>::buildCn(nodes);
+    std::vector<std::pair<size_t, size_t>> edges_expected({{0, 1}, {1, 2}, {2, 0}});
+    EXPECT_EQ(cycle.getEdgesList(), edges_expected);
+}

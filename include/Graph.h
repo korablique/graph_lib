@@ -29,7 +29,7 @@ public:
     static Graph<T> buildGraph(const std::vector<T>& nodes_data, const std::vector<std::pair<size_t, size_t>>& edges_list);
     static Graph<T> buildGraph(const std::vector<T>& nodes_data, const std::vector<std::vector<bool>>& adjacency_matrix);
 
-    Graph<T>* buildCn(const std::vector<Node<T>> &nodes, size_t n);
+    static Graph<T> buildCn(const std::vector<T> &nodes);
 
     bool operator==(const Graph<T>& other) const;
 

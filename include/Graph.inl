@@ -2,6 +2,7 @@
 #include <utility>
 #include <unordered_set>
 #include "GraphAlgorithms.h"
+#include "Graph.h"
 
 /**
  * Private constructor for example to create a complement graph (with the same nodes, but different edges).
@@ -13,15 +14,19 @@ Graph<T>::Graph(const std::vector<Node<T>> nodes, const std::vector<std::vector<
     setEdgesList(adjacency_matrix);
 }
 
-template <typename T>
-Graph<T>* Graph<T>::buildCn(const std::vector<Node<T>> &nodes, size_t n){
-    std::vector<std::pair<Node<T>, Node<T>>> edges_list;
-    for (int i = 0; i < n-2; ++i){
-        edges_list.push_back(std::make_pair(nodes[i], nodes[i+1]));
+/**
+ * @param nodes nodes must be in the order you want them to be in the cycle
+ * @return a cycle of the given nodes
+ */
+
+template<class T>
+Graph<T> Graph<T>::buildCn(const std::vector<T> &nodes) {
+    std::vector<std::pair<size_t, size_t>> edges_list;
+    for (int i = 0; i < nodes.size() - 1; ++i){
+        edges_list.push_back(std::make_pair(i, i + 1));
     }
-    edges_list.push_back(nodes[n-1], nodes[n]);
-    Graph<T> result = Graph(&nodes, &edges_list);
-    return &result;
+    edges_list.push_back(std::make_pair(nodes.size() - 1, 0));
+    return Graph<T>::buildGraph(nodes, edges_list);
 }
 
 template <typename T>

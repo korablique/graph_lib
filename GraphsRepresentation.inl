@@ -323,7 +323,6 @@ bool Graph<T>::operator==(const Graph<T> &other) const {
         return false;
     }
 
-
     // compare edges list
     auto other_nodes = other.getNodesList();
     auto other_edges = other.getEdgesList();
@@ -350,3 +349,70 @@ bool Graph<T>::operator==(const Graph<T> &other) const {
     }
     return true;
 }
+
+template<typename T>
+void Graph<T>::addEdge(int64_t idFirst, int64_t idSecond) {
+    bool has_edge = false;
+    auto it = m_edges.begin();
+    while (it != m_edges.end()) {
+        if ((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
+            has_edge = true;
+        } else {
+            it++;
+        }
+    }
+
+    if (!has_edge) {
+        // find indices of the nodes by their ids
+        int index1 = -1, index2 = -1;
+        for (int i = 0; i < m_nodes.size(); i++) {
+            if (m_nodes[i].getId() == idFirst) {
+                index1 = i;
+            } else if (m_nodes[i].getId() == idSecond) {
+                index2 = i;
+            }
+        }
+        if (index1 == -1 || index2 == -1) {
+            // there are no nodes with the given ids
+            return;
+        }
+
+        m_edges.push_back(std::make_pair(index1, index2));
+        setAdjacencyMatrix(m_nodes, m_edges);
+    }
+}
+
+template<typename T>
+void Graph<T>::removeEdge(int64_t idFirst, int64_t idSecond)
+{
+    auto it = m_edges.begin();
+    while (it != m_edges.end()) {
+        if ((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
+            it = m_edges.erase(it);
+            break;
+        } else {
+            it++;
+        }
+    }
+
+    // recalculate adjacency matrix
+    setAdjacencyMatrix(m_nodes, m_edges);
+}
+
+
+template<typename T>
+bool Graph<T>::hasNode(int64_t id)
+{
+    size_t has_node_index = -1;
+    for (int i = 0; i < m_nodes.size(); i++) {
+        if (m_nodes[i].m_id == id) {
+            return true;
+        }
+    }
+
+    if (has_node_index == -1) {
+        return false;
+    }
+}
+
+

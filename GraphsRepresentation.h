@@ -50,6 +50,10 @@ public:
 
     int64_t addNode(const T2& node_data);
     void removeNode(int64_t id);
+    void addEdge(int64_t idFirst, int64_t idSecond);
+    void removeEdge(int64_t idFirst, int64_t idSecond);
+    bool hasEdge(int64_t idFirst, int64_t idSecond);
+    bool hasNode(int64_t id);
 
     std::vector<std::vector<bool>> getAdjacencyMatrix() const;
     std::vector<Node<T2>> getNodesList() const;

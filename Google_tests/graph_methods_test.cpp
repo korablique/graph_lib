@@ -386,3 +386,10 @@ TEST_F(GraphMethodsTest, HasEdge) {
     // if the node with the given id does not exist
     EXPECT_EQ(graph.hasEdge(123, 124), false);
 }
+
+TEST_F(GraphMethodsTest, GetEdgesNumber) {
+
+    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
+    Graph<std::string> graph(nodes_data, adj_matrix_disconnected_simple);
+    EXPECT_EQ(graph.getEdgesNumber(), 2);
+}

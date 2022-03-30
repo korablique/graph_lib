@@ -54,6 +54,7 @@ public:
     void removeEdge(int64_t idFirst, int64_t idSecond);
     bool hasEdge(int64_t idFirst, int64_t idSecond);
     bool hasNode(int64_t id);
+    size_t getEdgesNumber();
 
     std::vector<std::vector<bool>> getAdjacencyMatrix() const;
     std::vector<Node<T2>> getNodesList() const;

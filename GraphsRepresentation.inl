@@ -439,4 +439,10 @@ bool Graph<T>::hasEdge(int64_t idFirst, int64_t idSecond)
     }
 }
 
+template<typename T>
+size_t Graph<T>::getEdgesNumber()
+{
+    return m_edges.size();
+}
+
 

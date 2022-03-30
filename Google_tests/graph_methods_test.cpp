@@ -373,3 +373,15 @@ TEST_F(GraphMethodsTest, HasNode) {
     // if the node with the given id does not exist
     EXPECT_EQ(graph.hasNode(123), false);
 }
+
+TEST_F(GraphMethodsTest, HasEdge) {
+    // if the node with the given id exists
+    std::vector<std::string> nodes_data({"str", "str", "str", "str"});
+    Graph<std::string> graph = Graph<std::string>::buildGraph(nodes_data, adj_matrix_disconnected_simple);
+    size_t nodeFirst = graph.getNodesList()[0].getId();
+    size_t nodeSecond = graph.getNodesList()[1].getId();
+    EXPECT_EQ(graph.hasEdge(nodeFirst, nodeSecond), true);
+
+    // if the node with the given id does not exist
+    EXPECT_EQ(graph.hasEdge(123, 124), false);
+}

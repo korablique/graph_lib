@@ -415,4 +415,23 @@ bool Graph<T>::hasNode(int64_t id)
     }
 }
 
-
+template<typename T>
+bool Graph<T>::hasEdge(int64_t idFirst, int64_t idSecond)
+{
+    auto it = m_edges.begin();
+    bool has_edge = false;
+    while(it != m_edges.end()) {
+        if((*it).first == idFirst && (*it).second == idSecond || (*it).first == idSecond && (*it).second == idFirst) {
+            has_edge = true;
+            break;
+        } else {
+            it++;
+        }
+    }
+    if(has_edge == false){
+        return false;
+    }
+    else{
+        return true;
+    }
+}

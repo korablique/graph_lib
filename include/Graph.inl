@@ -1,6 +1,8 @@
 #include <vector>
 #include <utility>
 #include <unordered_set>
+#include <stack>
+#include <queue>
 #include "GraphAlgorithms.h"
 #include "Graph.h"
 
@@ -422,3 +424,180 @@ bool Graph<T>::hasEdge(int64_t idFirst, int64_t idSecond)
         return true;
     }
 }
+
+template<class T>
+std::vector<int> Graph<T>::BFS(size_t start, size_t end) const {
+    std::queue<int> vertix; //очередь ближайших вершин
+    vertix.push (start);
+    std::vector<bool> painted (m_adjacency_matrix.size()); //вектор покрашенных вершин
+    for (int i = 0; i < m_adjacency_matrix.size(); i++){
+        painted[i] = false;
+    }
+    painted[start] = true;
+    std::vector<int> distance (m_adjacency_matrix.size()); // расстояние до данной вершины
+    std::vector<std::vector<int>> path (m_adjacency_matrix.size()); // путь до данной вершин
+    while (!vertix.empty()) {
+        int current_vertix = vertix.front();
+        vertix.pop();
+        for (int i=0; i < m_adjacency_matrix.size(); i++) {
+            if ((!painted[i]) && (m_adjacency_matrix[current_vertix][i] == true)) { //проверка смежной вершины на непокрашенность
+                painted[i] = true;
+                vertix.push(i); // добавление в очередь
+                distance[i] = distance[current_vertix]++; // подсчет расстояния до этой вершины
+                for (int j = 0; j < path[current_vertix].size(); j++) {
+                    path[i].push_back(path[current_vertix][j]); // построение пути
+                }
+                path[i].push_back(current_vertix);
+                if (i == end) {
+                }
+            }
+        }
+    }
+
+    if (!painted[end]) {
+        return path[end];;
+    }
+    else {
+        reverse(path.begin(), path.end());
+        return path[end];
+    }
+}
+
+template<class T>
+bool Graph<T>::Is_Euleran_Path() const {
+    std::vector<size_t> degree_list = getDegreeList();
+    auto connected_component = getConnectedComponents();
+    int Odd_Vertix = 0; //счетчик нечетных вершин
+    int Complicated_Graph_Connected_Component = 0; // счетчик сложных компонент связности
+    for (int i = 0; i < degree_list.size(); i++) {
+        if ((degree_list[i] % 2) != 0) {
+            Odd_Vertix++;
+        }
+        if (Odd_Vertix > 2) {
+            return false;
+        }
+    }
+
+    if(Odd_Vertix == 1){
+        return false;
+    }
+
+    for (int i = 0; i < connected_component.size(); i++) {
+        if (connected_component[i].size() > 1) {
+            Complicated_Graph_Connected_Component++;
+        }
+    }
+    if (Complicated_Graph_Connected_Component >= 2) {
+        return false;
+    }
+    return true;
+}
+
+template <typename T>
+bool Graph<T>::Is_Euleran_Cycle() const{ //проверка на Эйлеров цикл
+    std::vector<size_t> degree_list = getDegreeList();
+    bool is_euleran = Is_Euleran_Path();
+    if (is_euleran == 0) {
+        return false;
+    }
+    for (int i = 0; i < degree_list.size(); i++) {
+        if ((degree_list[i] % 2) != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<typename T>
+std::vector<int> Graph<T>::Search_Euleran_Graph() const{
+    std::vector<int> answer;
+    answer.resize(0);
+    if(Is_Euleran_Path() == false){
+        return answer;
+    }
+    auto connected_components = getConnectedComponents();
+    Node<T> Start_Vertix;
+    std::vector<size_t> degree_list = getDegreeList();
+    std::stack<int> Search_Path;
+    int current_Vertix = 0;
+    for (int i = 0; i < connected_components.size(); i++) { // поиск стартовой вершины
+        if (connected_components[i].size() > 1) {
+            for (int j = 0; j < connected_components[i].size(); j++) {
+                Node<T> Vert = connected_components[i][j];
+                if (degree_list[Vert.m_id] % 2 == 1) { //
+                    Start_Vertix = connected_components[i][j];
+                    break;
+                }
+            }
+        }
+    }
+
+    Search_Path.push(Start_Vertix);
+    bool found = false;
+    while (Search_Path.empty() == 0) {
+        found = false;
+        current_Vertix = Search_Path.top();
+        for (int i = 0; i < m_adjacency_matrix[current_Vertix].size(); i++) {
+            if (m_adjacency_matrix[current_Vertix][i] == 1) {
+                found = true; // нашли ребро
+                Search_Path.push(i);
+                m_adjacency_matrix[current_Vertix][i] = 0; // по сути обрубаем ребро
+                m_adjacency_matrix[i][current_Vertix] = 0;
+                break;
+            }
+        }
+        if (found == false) {
+            answer.push_back(Search_Path.top()); // выводим итоговый ответ
+            Search_Path.pop();
+        }
+    }
+    return answer;
+}
+
+template <typename T>
+bool Graph<T>::Is_Bipartied() const{
+    auto connected_component = getConnectedComponents();
+    std::stack<int> Search_Path;
+    int current_Vertix = 0;
+    if (connected_component.size() != 1)
+        return false;
+    Search_Path.push(0);
+    std::vector<int> painted; // покрашены 1 - зеленый, 2 - желтый
+    painted.resize(m_adjacency_matrix[0].size());
+    std::vector<int> answer;
+    painted[0] = 1;
+    Search_Path.push(0);
+    bool found;
+    while (Search_Path.empty() == 0) {
+        found = false; // нашли вершинку
+        current_Vertix = Search_Path.top();
+        for (int i = 0; i < m_adjacency_matrix[current_Vertix].size(); i++) {
+            if (m_adjacency_matrix[current_Vertix][i] == 1) {
+                if (painted[i] == 0) {
+                    found = true; // нашли
+                    Search_Path.push(i);
+                    if (painted[current_Vertix] == 2) {
+                        painted[i] = 1; // красим в противоположный
+                    } else {
+                        painted[i] = 2;
+                    } // красим в противоположный
+                    break;
+                } else {
+                    if ((painted[current_Vertix] != painted[i])) { // проверка на соответствие двудольности
+                        found = false;
+                        continue;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+        if (found == false) {
+            answer.push_back(Search_Path.top()); // выводим итоговый ответ
+            Search_Path.pop();
+        }
+    }
+    return true;
+}
+
+

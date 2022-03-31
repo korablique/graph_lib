@@ -48,6 +48,11 @@ public:
     bool isConnected() const;
     std::vector<std::vector<Node<T>>> getConnectedComponents() const;
     Graph<T> getComplementGraph() const;
+    std::vector<int> BFS(size_t start, size_t end) const;
+    bool Is_Euleran_Path() const;
+    bool Is_Euleran_Cycle() const;
+    std::vector<int> Search_Euleran_Graph() const;
+    bool Is_Bipartied() const;
 };
 
 #include "Graph.inl"

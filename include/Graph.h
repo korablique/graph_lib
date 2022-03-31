@@ -39,6 +39,7 @@ public:
     void removeEdge(int64_t idFirst, int64_t idSecond);
     bool hasEdge(int64_t idFirst, int64_t idSecond);
     bool hasNode(int64_t id);
+    int findNodeIndex(Node<T> inp_node);
 
     std::vector<std::vector<bool>> getAdjacencyMatrix() const;
     std::vector<Node<T>> getNodesList() const;
@@ -48,6 +49,11 @@ public:
     bool isConnected() const;
     std::vector<std::vector<Node<T>>> getConnectedComponents() const;
     Graph<T> getComplementGraph() const;
+    std::vector<int> BFS(size_t start, size_t end) const;
+    bool Is_Euleran_Path() const;
+    bool Is_Euleran_Cycle() const;
+    std::vector<int> Search_Euleran_Graph() const;
+    bool Is_Bipartied() const;
 };
 
 #include "Graph.inl"

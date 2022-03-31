@@ -425,8 +425,8 @@ bool Graph<T>::hasEdge(int64_t idFirst, int64_t idSecond)
     }
 }
 
-template<class T>
-std::vector<int> Graph<T>::BFS(size_t start, size_t end) const {
+template <class T>
+std::vector<int> Graph<T>::BFS(size_t start, size_t end) const{
     std::queue<int> vertix; //очередь ближайших вершин
     vertix.push (start);
     std::vector<bool> painted (m_adjacency_matrix.size()); //вектор покрашенных вершин
@@ -434,7 +434,6 @@ std::vector<int> Graph<T>::BFS(size_t start, size_t end) const {
         painted[i] = false;
     }
     painted[start] = true;
-    std::vector<int> distance (m_adjacency_matrix.size()); // расстояние до данной вершины
     std::vector<std::vector<int>> path (m_adjacency_matrix.size()); // путь до данной вершин
     while (!vertix.empty()) {
         int current_vertix = vertix.front();
@@ -443,8 +442,7 @@ std::vector<int> Graph<T>::BFS(size_t start, size_t end) const {
             if ((!painted[i]) && (m_adjacency_matrix[current_vertix][i] == true)) { //проверка смежной вершины на непокрашенность
                 painted[i] = true;
                 vertix.push(i); // добавление в очередь
-                distance[i] = distance[current_vertix]++; // подсчет расстояния до этой вершины
-                for (int j = 0; j < path[current_vertix].size(); j++) {
+                for (int j = path[current_vertix].size() - 1; j >= 0; j++) {
                     path[i].push_back(path[current_vertix][j]); // построение пути
                 }
                 path[i].push_back(current_vertix);
@@ -453,14 +451,9 @@ std::vector<int> Graph<T>::BFS(size_t start, size_t end) const {
             }
         }
     }
+    reverse(path.begin(), path.end());
+    return path[end];
 
-    if (!painted[end]) {
-        return path[end];;
-    }
-    else {
-        reverse(path.begin(), path.end());
-        return path[end];
-    }
 }
 
 template<class T>
@@ -519,7 +512,7 @@ std::vector<int> Graph<T>::Search_Euleran_Graph() const{
     Node<T> Start_Vertix;
     std::vector<size_t> degree_list = getDegreeList();
     std::stack<int> Search_Path;
-    int current_Vertix = 0;
+    Node<T> current_Vertix = 0;
     for (int i = 0; i < connected_components.size(); i++) { // поиск стартовой вершины
         if (connected_components[i].size() > 1) {
             for (int j = 0; j < connected_components[i].size(); j++) {
@@ -537,12 +530,12 @@ std::vector<int> Graph<T>::Search_Euleran_Graph() const{
     while (Search_Path.empty() == 0) {
         found = false;
         current_Vertix = Search_Path.top();
-        for (int i = 0; i < m_adjacency_matrix[current_Vertix].size(); i++) {
-            if (m_adjacency_matrix[current_Vertix][i] == 1) {
+        for (int i = 0; i < m_adjacency_matrix[current_Vertix.m_id].size(); i++) {
+            if (m_adjacency_matrix[current_Vertix.m_id][i] == 1) {
                 found = true; // нашли ребро
                 Search_Path.push(i);
-                m_adjacency_matrix[current_Vertix][i] = 0; // по сути обрубаем ребро
-                m_adjacency_matrix[i][current_Vertix] = 0;
+                m_adjacency_matrix[current_Vertix.m_id][i] = 0; // по сути обрубаем ребро
+                m_adjacency_matrix[i][current_Vertix.m_id] = 0;
                 break;
             }
         }

@@ -501,7 +501,7 @@ bool Graph<T>::Is_Euleran_Cycle() const{ //проверка на Эйлеров 
 //
 //    }
 
-    return std::all_of(degree_list[0], degree_list.size(), [](int i){ return i % 2 == 0; });
+    return std::all_of(degree_list[0], degree_list.size(), [](int i){ return i % 2 != 0; });
     return true;
 }
 

@@ -428,7 +428,7 @@ bool Graph<T>::hasEdge(int64_t idFirst, int64_t idSecond)
 template <class T>
 std::vector<int> Graph<T>::BFS(size_t start, size_t end) const{
     std::queue<int> vertix; //очередь ближайших вершин
-    vertix.push (start);
+    vertix.push ((int)start);
     std::vector<bool> painted (m_adjacency_matrix.size()); //вектор покрашенных вершин
     for (int i = 0; i < m_adjacency_matrix.size(); i++){
         painted[i] = false;
@@ -439,10 +439,10 @@ std::vector<int> Graph<T>::BFS(size_t start, size_t end) const{
         int current_vertix = vertix.front();
         vertix.pop();
         for (int i=0; i < m_adjacency_matrix.size(); i++) {
-            if ((!painted[i]) && (m_adjacency_matrix[current_vertix][i] == true)) { //проверка смежной вершины на непокрашенность
+            if ((!painted[i]) && m_adjacency_matrix[current_vertix][i]) { //проверка смежной вершины на непокрашенность
                 painted[i] = true;
                 vertix.push(i); // добавление в очередь
-                for (int j = path[current_vertix].size() - 1; j >= 0; --j) {
+                for (size_t j = path[current_vertix].size() - 1; j >= 0; --j) {
                     path[i].push_back(path[current_vertix][j]); // построение пути
                 }
                 path[i].push_back(current_vertix);
@@ -462,8 +462,8 @@ bool Graph<T>::Is_Euleran_Path() const {
     auto connected_component = getConnectedComponents();
     int Odd_Vertix = 0; //счетчик нечетных вершин
     int Complicated_Graph_Connected_Component = 0; // счетчик сложных компонент связности
-    for (int i = 0; i < degree_list.size(); i++) {
-        if ((degree_list[i] % 2) != 0) {
+    for (unsigned long i : degree_list) {
+        if ((i % 2) != 0) {
             Odd_Vertix++;
         }
         if (Odd_Vertix > 2) {
@@ -493,11 +493,15 @@ bool Graph<T>::Is_Euleran_Cycle() const{ //проверка на Эйлеров 
     if (is_euleran == 0) {
         return false;
     }
-    for (int i = 0; i < degree_list.size(); i++) {
-        if ((degree_list[i] % 2) != 0) {
-            return false;
-        }
-    }
+
+//    for (unsigned long i : degree_list) {
+//        if ((i % 2) != 0) {
+//            return false;
+//        }
+//
+//    }
+
+    return std::all_of(degree_list[0], degree_list.size(), [](int i){ return i % 2 == 0; });
     return true;
 }
 
@@ -539,7 +543,7 @@ std::vector<int> Graph<T>::Search_Euleran_Graph() const{
                 break;
             }
         }
-        if (found == false) {
+        if (!found) {
             answer.push_back(Search_Path.top()); // выводим итоговый ответ
             Search_Path.pop();
         }
@@ -585,7 +589,7 @@ bool Graph<T>::Is_Bipartied() const{
                 }
             }
         }
-        if (found == false) {
+        if (!found) {
             answer.push_back(Search_Path.top()); // выводим итоговый ответ
             Search_Path.pop();
         }

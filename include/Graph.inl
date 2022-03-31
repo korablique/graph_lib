@@ -530,12 +530,12 @@ std::vector<int> Graph<T>::Search_Euleran_Graph() const{
     while (Search_Path.empty() == 0) {
         found = false;
         current_Vertix = Search_Path.top();
-        for (int i = 0; i < m_adjacency_matrix[current_Vertix.m_id].size(); i++) {
-            if (m_adjacency_matrix[current_Vertix.m_id][i] == 1) {
+        for (int i = 0; i < m_adjacency_matrix[findNodeIndex(current_Vertix)].size(); i++) {
+            if (m_adjacency_matrix[findNodeIndex(current_Vertix)][i] == 1) {
                 found = true; // нашли ребро
                 Search_Path.push(i);
-                m_adjacency_matrix[current_Vertix.m_id][i] = 0; // по сути обрубаем ребро
-                m_adjacency_matrix[i][current_Vertix.m_id] = 0;
+                m_adjacency_matrix[findNodeIndex(current_Vertix)][i] = 0; // по сути обрубаем ребро
+                m_adjacency_matrix[i][findNodeIndex(current_Vertix)] = 0;
                 break;
             }
         }
@@ -591,6 +591,15 @@ bool Graph<T>::Is_Bipartied() const{
         }
     }
     return true;
+}
+
+template<class T>
+int Graph<T>::findNodeIndex(Node<T> inp_node){
+    for (int i = 0; i < m_nodes.size(); ++i){
+        if (inp_node.m_id == m_nodes[i].m_id)
+            return i;
+    }
+    return -1;
 }
 
 

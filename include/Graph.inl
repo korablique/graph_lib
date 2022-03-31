@@ -442,7 +442,7 @@ std::vector<int> Graph<T>::BFS(size_t start, size_t end) const{
             if ((!painted[i]) && (m_adjacency_matrix[current_vertix][i] == true)) { //проверка смежной вершины на непокрашенность
                 painted[i] = true;
                 vertix.push(i); // добавление в очередь
-                for (int j = path[current_vertix].size() - 1; j >= 0; j++) {
+                for (int j = path[current_vertix].size() - 1; j >= 0; --j) {
                     path[i].push_back(path[current_vertix][j]); // построение пути
                 }
                 path[i].push_back(current_vertix);
